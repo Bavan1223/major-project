@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template_string
+from flask import Flask, Response, jsonify, render_template_string
 import json
 import os
 
@@ -691,6 +691,12 @@ def dashboard():
     return render_template_string(HTML)
 
 
+@app.route("/favicon.ico")
+def favicon():
+
+    return Response(status=204)
+
+
 @app.route("/api/events")
 def api_events():
 
@@ -807,7 +813,7 @@ if __name__ == "__main__":
     print()
 
     app.run(
-        host="127.0.0.1",
+        host="0.0.0.0",
         port=5000,
         debug=False
     )
