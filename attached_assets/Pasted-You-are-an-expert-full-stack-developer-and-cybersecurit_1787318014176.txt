@@ -1,0 +1,1295 @@
+You are an expert full-stack developer and cybersecurity SOC dashboard designer.
+
+I am building a BE CSE major project called:
+
+"Real-Time Ransomware Detection and Prevention Using System Behavior Monitoring and Artificial Intelligence"
+
+I already have a working Python backend on Ubuntu. DO NOT redesign or replace the existing detection architecture.
+
+Your job is to build a professional, modern, responsive SECURITY OPERATIONS CENTER (SOC) dashboard UI that connects to my existing backend/API.
+
+==================================================
+PROJECT ARCHITECTURE
+==================================================
+
+Current pipeline:
+
+File Monitor
+Process Monitor
+Network Monitor
+        ↓
+Common Event Schema
+        ↓
+Event Logger + Event Collector
+        ↓
+Feature Extractor
+        ↓
+Rule-Based Detection
+        +
+Machine Learning Detection
+        ↓
+Risk Engine
+        ↓
+Response Controller
+        ↓
+Protection Controller
+        ↓
+Dashboard
+
+ML model:
+
+Version: 2.0.0
+Algorithm: GradientBoostingClassifier
+Threshold: 0.70
+Feature version: 1.0
+
+Important ML behavior:
+
+NORMAL:
+ML probability below threshold → no ML contribution
+
+RANSOMWARE_LIKE:
+ML probability >= 0.70 → ML contributes
+
+Safety rule:
+
+ML ALONE MUST NEVER PRODUCE CRITICAL.
+
+CRITICAL occurs only when:
+
+Rule-based risk = HIGH
+AND
+ML = RANSOMWARE_LIKE
+AND
+ML probability >= 0.70
+
+Example:
+
+Rule HIGH + ML 0.9934 → CRITICAL
+
+Rule HIGH + ML NORMAL → HIGH
+
+Rule NORMAL + ML 0.9934 → MEDIUM
+
+Rule MEDIUM + ML 0.6664 → MEDIUM
+
+ML unavailable → rule-only behavior
+
+All containment is currently DRY_RUN / LAB-SAFE.
+
+==================================================
+EXISTING BACKEND
+==================================================
+
+The current Python project contains:
+
+core/
+    event_schema.py
+    event_collector.py
+    feature_extractor.py
+    risk_engine.py
+    response_controller.py
+    protection_controller.py
+    correlation_engine.py
+    audit_attributor.py
+
+monitor/
+    file_monitor.py
+    process_monitor.py
+    network_monitor.py
+
+ml/
+    inference/
+        ml_signal.py
+        predictor.py
+
+simulator/
+    safe_simulator.py
+
+detection_pipeline.py
+
+dashboard.py
+
+events are persisted in:
+
+logs/events.jsonl
+
+The existing backend should remain the source of truth.
+
+DO NOT invent fake detection logic.
+
+==================================================
+MAIN OBJECTIVE
+==================================================
+
+Create a dashboard that looks like a professional cybersecurity SOC/XDR platform.
+
+Design inspiration:
+
+Modern SOC
+SIEM
+EDR/XDR
+Cybersecurity monitoring console
+Dark enterprise security interface
+
+It should feel like a real security product rather than a college project.
+
+Use:
+
+React
+TypeScript
+Vite
+Tailwind CSS
+
+Use a component-based architecture.
+
+Use Lucide icons or another professional icon library.
+
+Avoid excessive animations.
+
+Prioritize clarity, usability and real-time monitoring.
+
+==================================================
+COLOR / VISUAL DESIGN
+==================================================
+
+Overall theme:
+
+Dark cybersecurity SOC interface.
+
+Background:
+Very dark navy / charcoal.
+
+Cards:
+Slightly lighter dark surfaces.
+
+Borders:
+Subtle gray/blue borders.
+
+Primary accent:
+Cyber blue.
+
+Risk colors:
+
+NORMAL → green
+LOW → blue
+MEDIUM → yellow/orange
+HIGH → red
+CRITICAL → bright red / magenta emphasis
+
+Do NOT make the entire interface red.
+
+Red should only appear when there is an actual security alert.
+
+Typography:
+
+Use a clean modern font such as Inter.
+
+Use monospace font for:
+
+PID
+IP addresses
+ports
+timestamps
+file paths
+process names
+event IDs
+
+==================================================
+GLOBAL LAYOUT
+==================================================
+
+Create a fixed left sidebar.
+
+Sidebar:
+
+Logo:
+Shield + AI icon
+
+Project name:
+
+RANSOMWARE
+DEFENSE
+
+Navigation:
+
+Dashboard
+Live Events
+File Activity
+Network Activity
+Processes
+Detection
+ML Analysis
+Response
+Protection
+System Health
+Settings
+
+Bottom of sidebar:
+
+Ubuntu Lab
+192.168.74.131
+● ONLINE
+
+Main content:
+
+Top header
+Dashboard content
+Responsive layout
+
+==================================================
+TOP HEADER
+==================================================
+
+Header should contain:
+
+"Ransomware Defense SOC"
+
+Environment:
+
+UBUNTU LAB
+
+Host:
+
+192.168.74.131
+
+Monitoring status:
+
+● LIVE
+
+Current timestamp
+
+Refresh/live indicator
+
+A small "DRY RUN" badge.
+
+Example:
+
+┌───────────────────────────────────────────────────────┐
+│ RANSOMWARE DEFENSE SOC      UBUNTU LAB      ● LIVE   │
+│ Host: 192.168.74.131                    DRY RUN      │
+└───────────────────────────────────────────────────────┘
+
+==================================================
+MAIN DASHBOARD
+==================================================
+
+Dashboard should contain these sections.
+
+1. SYSTEM OVERVIEW
+
+Create 5–6 metric cards.
+
+Cards:
+
+TOTAL EVENTS
+FILE EVENTS
+NETWORK EVENTS
+PROCESS EVENTS
+ACTIVE ALERTS
+CURRENT RISK
+
+Each card should contain:
+
+icon
+large number
+small description
+trend/status
+
+Example:
+
+TOTAL EVENTS
+1,248
+Last 10 sec
+↑ Live
+
+CURRENT RISK
+CRITICAL
+Rule + ML confirmed
+
+==================================================
+2. SECURITY STATUS HERO
+==================================================
+
+Create a large security status card.
+
+Normal:
+
+🟢 SYSTEM SECURE
+
+Risk:
+
+LOW / MEDIUM / HIGH / CRITICAL
+
+When CRITICAL:
+
+show:
+
+"RANSOMWARE-LIKE BEHAVIOR DETECTED"
+
+and:
+
+"Rule + ML behavioral signals agree"
+
+Show:
+
+Risk score
+ML probability
+Detection timestamp
+
+Example:
+
+CRITICAL
+
+RANSOMWARE-LIKE BEHAVIOR DETECTED
+
+Confidence:
+99.34%
+
+Rule Signal:
+Rapid mass file modification
+
+ML Signal:
+RANSOMWARE_LIKE
+
+Response:
+CRITICAL_RESPONSE_RESERVED
+
+Protection:
+DRY_RUN
+
+==================================================
+3. REAL-TIME EVENT STREAM
+==================================================
+
+Create a large live event table.
+
+Columns:
+
+TIME
+SOURCE
+EVENT TYPE
+INDICATOR
+PID
+PROCESS
+DETAILS
+RISK
+
+Sources:
+
+FILE MONITOR
+PROCESS MONITOR
+NETWORK MONITOR
+DETECTION ENGINE
+
+Use badges.
+
+Example:
+
+10:42:11
+FILE_MONITOR
+file_modified
+rapid_mass_file_modification
+PID 4218
+python3
+/victim_17.txt
+HIGH
+
+Events should update automatically.
+
+Use polling or WebSocket/SSE if available.
+
+Default polling:
+
+every 1 second.
+
+Newest events appear at the top.
+
+==================================================
+4. FILE BEHAVIOR ANALYTICS
+==================================================
+
+Create a dedicated file activity panel.
+
+Show:
+
+Files modified
+Unique files modified
+Files created
+Files deleted
+Files renamed
+Modification rate
+Suspicious indicators
+
+Create a time-series chart:
+
+"File Modification Activity"
+
+X axis:
+Time
+
+Y axis:
+Modified files
+
+Show a clear spike during ransomware-like behavior.
+
+Also show:
+
+Unique files modified:
+20
+
+Modification window:
+10 seconds
+
+Threshold:
+10 files
+
+Detection state:
+TRIGGERED
+
+==================================================
+5. NETWORK ACTIVITY
+==================================================
+
+Create a network monitoring section.
+
+Cards:
+
+Network Events
+Established Connections
+Unique Remote IPs
+Repeated Connections
+
+Table:
+
+TIME
+PID
+PROCESS
+LOCAL ADDRESS
+REMOTE ADDRESS
+STATUS
+INDICATOR
+
+Example:
+
+10:43:21
+4218
+python3
+192.168.74.131:43821
+192.168.74.129:4444
+ESTABLISHED
+new_established_connection
+
+Highlight repeated connections.
+
+==================================================
+6. PROCESS ACTIVITY
+==================================================
+
+Create process monitoring panel.
+
+Show:
+
+PID
+Process
+Executable
+Username
+Start Time
+Network Connections
+Risk
+
+Highlight newly started processes.
+
+Example:
+
+PID: 4218
+Process: python3
+Executable:
+/usr/bin/python3
+Status:
+ACTIVE
+
+==================================================
+7. ML ANALYSIS PANEL
+==================================================
+
+This is one of the MOST IMPORTANT sections.
+
+Create a dedicated "AI BEHAVIORAL ANALYSIS" panel.
+
+Show:
+
+Model Version:
+2.0.0
+
+Algorithm:
+GradientBoostingClassifier
+
+Feature Version:
+1.0
+
+Threshold:
+0.70
+
+Prediction:
+
+NORMAL
+or
+RANSOMWARE_LIKE
+
+Probability:
+
+99.34%
+
+Above Threshold:
+
+YES
+
+ML Contribution:
+
+YES
+
+Inference Time:
+
+0.63 ms
+
+Create a probability gauge.
+
+Example:
+
+NORMAL
+0.73%
+
+or
+
+RANSOMWARE_LIKE
+99.34%
+
+Use a horizontal confidence bar.
+
+Also display important features returned by ML.
+
+Example:
+
+unique_files_modified
+20
+
+file_renamed
+0
+
+file_deleted
+0
+
+total_events
+20
+
+file_created
+20
+
+Show direction:
+
+NORMAL
+or
+RANSOMWARE
+
+==================================================
+8. RULE + ML CORRELATION
+==================================================
+
+Create a visual explanation of the final risk decision.
+
+Example:
+
+RULE ENGINE
+     │
+     │ HIGH
+     ↓
+ML ENGINE
+     │
+     │ RANSOMWARE_LIKE
+     │ 99.34%
+     ↓
+CORRELATION
+     │
+     ↓
+CRITICAL
+
+Make this visually clear.
+
+For normal behavior:
+
+RULE:
+NORMAL
+
+ML:
+NORMAL
+
+FINAL:
+NORMAL
+
+For ML-only detection:
+
+RULE:
+NORMAL
+
+ML:
+RANSOMWARE_LIKE
+
+FINAL:
+MEDIUM
+
+Explain:
+
+"ML advisory signal detected. Critical escalation requires independent rule confirmation."
+
+==================================================
+9. DETECTION ALERTS
+==================================================
+
+Create alert cards.
+
+Example:
+
+🚨 CRITICAL
+Ransomware-like behavior detected
+
+Time:
+10:43:22
+
+PID:
+4218
+
+Process:
+python3
+
+Files:
+20 unique
+
+ML:
+99.34%
+
+Rule:
+HIGH
+
+Final:
+CRITICAL
+
+Buttons:
+
+VIEW DETAILS
+TRACE PROCESS
+VIEW EVENTS
+
+==================================================
+10. RESPONSE PANEL
+==================================================
+
+Show what the system recommends.
+
+Risk → Recommended response.
+
+NORMAL:
+NO_ACTION
+
+LOW:
+MONITOR
+
+MEDIUM:
+INCREASE_MONITORING
+
+HIGH:
+CONTAINMENT_RECOMMENDED
+
+CRITICAL:
+CRITICAL_RESPONSE_RESERVED
+
+Important:
+
+Clearly display:
+
+"DRY RUN MODE"
+
+"NO REAL CONTAINMENT ACTIONS ARE CURRENTLY EXECUTED."
+
+This is important for the project safety demonstration.
+
+==================================================
+11. PROTECTION PANEL
+==================================================
+
+Show:
+
+Risk Level
+Response Action
+Protection Action
+Mode
+
+Examples:
+
+HIGH
+
+Response:
+CONTAINMENT_RECOMMENDED
+
+Protection:
+LAB_CONTAINMENT_RECOMMENDED
+
+Mode:
+DRY_RUN
+
+CRITICAL:
+
+Protection:
+CRITICAL_PROTECTION_RESERVED
+
+Mode:
+DRY_RUN
+
+Do not create real destructive controls.
+
+==================================================
+12. ATTACK / BEHAVIOR TIMELINE
+==================================================
+
+Create a horizontal/vertical timeline.
+
+Example:
+
+10:42:58
+Process started
+python3
+
+10:43:00
+File activity detected
+3 files
+
+10:43:02
+Rapid file modification
+10 files
+
+10:43:03
+Rule engine → HIGH
+
+10:43:03
+ML → RANSOMWARE_LIKE
+99.34%
+
+10:43:03
+Correlation → CRITICAL
+
+10:43:03
+Response → CRITICAL_RESPONSE_RESERVED
+
+This will be excellent for project demonstrations.
+
+==================================================
+13. EVENT DETAILS DRAWER
+==================================================
+
+When the user clicks an event, open a side drawer.
+
+Show complete JSON-style information:
+
+Timestamp
+Source
+Event type
+PID
+Process
+Indicator
+Data
+
+Example:
+
+{
+  "timestamp": "...",
+  "source": "file_monitor",
+  "event_type": "file_modified",
+  "pid": 4218,
+  "process": "python3",
+  "indicator": "rapid_mass_file_modification",
+  "data": {
+      "path": "/home/bavan/ransomware-lab/test-files/victim_1.txt"
+  }
+}
+
+Make this readable.
+
+==================================================
+14. SYSTEM HEALTH
+==================================================
+
+Create a system health section.
+
+Show:
+
+File Monitor
+● RUNNING
+
+Process Monitor
+● RUNNING
+
+Network Monitor
+● RUNNING
+
+Event Logger
+● RUNNING
+
+Event Collector
+● RUNNING
+
+Feature Extractor
+● READY
+
+ML Model
+● LOADED
+
+Risk Engine
+● READY
+
+Response Controller
+● DRY RUN
+
+Protection Controller
+● DRY RUN
+
+Dashboard API
+● ONLINE
+
+==================================================
+15. DASHBOARD API
+==================================================
+
+The frontend should be designed to consume backend data.
+
+Prefer API endpoints such as:
+
+GET /api/events
+
+GET /api/status
+
+GET /api/risk
+
+GET /api/ml
+
+GET /api/network
+
+GET /api/processes
+
+GET /api/file-activity
+
+If these endpoints don't exist yet, create a clean API adapter layer in the frontend.
+
+DO NOT invent backend data and pretend it is real.
+
+For development/demo mode, clearly label simulated data as DEMO DATA.
+
+==================================================
+16. REAL-TIME BEHAVIOR
+==================================================
+
+Dashboard should automatically update.
+
+Default:
+
+poll every 1 second.
+
+When new events arrive:
+
+update:
+
+event counter
+file counter
+network counter
+process counter
+alerts
+risk status
+ML probability
+charts
+timeline
+
+Do not reload the page.
+
+==================================================
+17. RESPONSIVE DESIGN
+==================================================
+
+Desktop:
+Full SOC layout.
+
+Tablet:
+Collapsible sidebar.
+
+Mobile:
+Sidebar becomes drawer.
+
+Tables become horizontally scrollable cards.
+
+==================================================
+18. UX DETAILS
+==================================================
+
+Add:
+
+Tooltips
+Loading states
+Empty states
+Error states
+Connection status
+Last updated time
+
+When backend is unavailable:
+
+Show:
+
+"BACKEND CONNECTION LOST"
+
+Do not show fake "LIVE" status.
+
+When backend reconnects:
+
+Show:
+
+"BACKEND CONNECTED"
+
+==================================================
+19. SECURITY UX
+==================================================
+
+This is a cybersecurity project.
+
+Use clear terminology.
+
+Never say:
+
+"Virus detected"
+
+Prefer:
+
+"Ransomware-like behavioral activity detected"
+
+Never claim:
+
+"100% ransomware"
+
+Instead:
+
+"ML confidence: 99.34%"
+
+Explain that ML probability is model output, not calibrated real-world certainty.
+
+==================================================
+20. DASHBOARD DEMO MODE
+==================================================
+
+Create a DEMO MODE toggle.
+
+Demo mode must use clearly labeled simulated events.
+
+Provide scenarios:
+
+NORMAL
+MODERATE ACTIVITY
+RANSOMWARE SIMULATION
+
+When selecting:
+
+RANSOMWARE SIMULATION
+
+display a controlled visualization:
+
+20 unique files modified
+Rule → HIGH
+ML → RANSOMWARE_LIKE
+Probability → 99.34%
+Final → CRITICAL
+Response → CRITICAL_RESPONSE_RESERVED
+Protection → DRY_RUN
+
+Do NOT perform actual encryption.
+
+Do NOT delete files.
+
+Do NOT kill processes.
+
+==================================================
+21. PROJECT-SPECIFIC SAFETY
+==================================================
+
+The UI must NEVER:
+
+execute shell commands
+kill processes
+delete files
+encrypt files
+modify firewall rules
+perform real containment
+
+The dashboard is an observability/control visualization layer only.
+
+All protection actions remain DRY_RUN.
+
+==================================================
+22. DASHBOARD PAGES
+==================================================
+
+Create these routes:
+
+/
+/events
+/files
+/network
+/processes
+/detection
+/ml
+/response
+/protection
+/system
+
+Dashboard:
+overall SOC overview.
+
+Events:
+full searchable event stream.
+
+Files:
+file behavior analytics.
+
+Network:
+network activity.
+
+Processes:
+process monitoring.
+
+Detection:
+rule + ML detection history.
+
+ML:
+detailed AI analysis.
+
+Response:
+response decisions.
+
+Protection:
+lab-safe protection state.
+
+System:
+component health.
+
+==================================================
+23. SEARCH / FILTERING
+==================================================
+
+Event page should support:
+
+Search
+Source filter
+Event type filter
+Risk filter
+PID filter
+Process filter
+Time range
+
+Example:
+
+Source:
+file_monitor
+
+Risk:
+HIGH
+
+Process:
+python3
+
+==================================================
+24. DATA VISUALIZATION
+==================================================
+
+Use charts for:
+
+File modifications over time
+Network connections over time
+Risk levels over time
+ML probability over time
+Event distribution
+
+Avoid unnecessary charts.
+
+Charts should communicate security behavior clearly.
+
+==================================================
+25. CODE QUALITY
+==================================================
+
+Use:
+
+Reusable components
+TypeScript interfaces
+API service layer
+Clean folder structure
+Responsive components
+Error handling
+Loading states
+
+Suggested structure:
+
+src/
+  components/
+    Sidebar.tsx
+    Header.tsx
+    MetricCard.tsx
+    RiskCard.tsx
+    EventTable.tsx
+    MLPanel.tsx
+    NetworkTable.tsx
+    ProcessTable.tsx
+    Timeline.tsx
+    SystemHealth.tsx
+
+  pages/
+    Dashboard.tsx
+    Events.tsx
+    Files.tsx
+    Network.tsx
+    Processes.tsx
+    Detection.tsx
+    MLAnalysis.tsx
+    Response.tsx
+    Protection.tsx
+    System.tsx
+
+  services/
+    api.ts
+
+  types/
+    events.ts
+    risk.ts
+    ml.ts
+
+  hooks/
+    useEvents.ts
+    useSystemStatus.ts
+
+==================================================
+26. IMPORTANT BACKEND INTEGRATION RULE
+==================================================
+
+The current Python backend is the source of truth.
+
+Do NOT rewrite:
+
+feature_extractor.py
+risk_engine.py
+event_schema.py
+event_collector.py
+ML model
+ML inference
+monitors
+
+unless explicitly requested.
+
+The frontend must adapt to the existing backend.
+
+If an endpoint needs to be added, keep it isolated and do not change existing detection behavior.
+
+==================================================
+27. FINAL QUALITY TARGET
+==================================================
+
+The final result should look like:
+
+A professional SOC dashboard that could realistically be shown to:
+
+Project evaluator
+Cybersecurity engineer
+Software engineer
+Technical interviewer
+
+It should immediately communicate:
+
+"What is happening on the Ubuntu machine?"
+
+"Is ransomware-like behavior occurring?"
+
+"What did the rule engine detect?"
+
+"What did the ML model predict?"
+
+"Why was the final risk assigned?"
+
+"What response is recommended?"
+
+"Is protection currently active or DRY RUN?"
+
+==================================================
+28. DEMO SCENARIO
+==================================================
+
+The dashboard must be excellent for this exact viva demonstration:
+
+1. Start all monitors.
+
+2. Open dashboard.
+
+3. Show:
+
+SYSTEM NORMAL
+
+ML:
+NORMAL
+
+4. Run safe ransomware simulator.
+
+5. Dashboard updates live.
+
+6. File modification graph spikes.
+
+7. Unique files modified increases.
+
+8. Detection alert appears.
+
+9. Rule engine becomes HIGH.
+
+10. ML becomes:
+
+RANSOMWARE_LIKE
+Probability ≈ 99%
+
+11. Final risk becomes:
+
+CRITICAL
+
+12. Response:
+
+CRITICAL_RESPONSE_RESERVED
+
+13. Protection:
+
+DRY_RUN
+
+14. Event timeline explains exactly why.
+
+This entire sequence should be visually understandable without reading source code.
+
+==================================================
+FINAL INSTRUCTION
+==================================================
+
+Build the dashboard now.
+
+First inspect the existing project/API structure if available.
+
+Do not replace the existing backend.
+
+Prioritize:
+
+1. Professional SOC UI
+2. Real-time event visualization
+3. Rule + ML explainability
+4. Risk visualization
+5. File/network/process monitoring
+6. Response/protection visibility
+7. Demo readiness
+8. Responsive design
+9. Clean TypeScript architecture
+
+The dashboard should feel like a real ransomware detection product, not a generic admin dashboard.
