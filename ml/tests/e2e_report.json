@@ -1,0 +1,204 @@
+{
+  "validation_type": "e2e_ubuntu",
+  "timestamp": "2026-08-20T17:38:32.548454+00:00",
+  "environment": {
+    "platform": "Linux 7.0.0-29-generic",
+    "python": "3.12.3",
+    "project_root": "/home/bavan/ransomware-lab",
+    "core_extractor_available": true,
+    "feature_version": "1.0",
+    "model_version": "1.0.0",
+    "threshold": 0.7
+  },
+  "scenarios": [
+    {
+      "scenario": "Normal: Light file editing",
+      "expected_label": 0,
+      "expected_label_name": "NORMAL",
+      "event_count": 5,
+      "full_features": {
+        "total_events": 5,
+        "file_events": 5,
+        "file_created": 3,
+        "file_modified": 2,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 2,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0,
+        "suspicious_indicators": 0
+      },
+      "ml_features_used": {
+        "total_events": 5,
+        "file_created": 3,
+        "file_modified": 2,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 2,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "excluded_features": {
+        "file_events": 5,
+        "suspicious_indicators": 0
+      },
+      "ml_result": {
+        "prediction": 0,
+        "label": "NORMAL",
+        "probability": 0.1653,
+        "above_threshold": false,
+        "threshold": 0.7,
+        "model_version": "1.0.0",
+        "feature_version": "1.0",
+        "important_features": [
+          {
+            "feature": "unique_files_modified",
+            "value": 2,
+            "contribution": -1.0818,
+            "direction": "normal"
+          },
+          {
+            "feature": "total_events",
+            "value": 5,
+            "contribution": -0.7628,
+            "direction": "normal"
+          },
+          {
+            "feature": "file_deleted",
+            "value": 0,
+            "contribution": -0.4462,
+            "direction": "normal"
+          },
+          {
+            "feature": "file_renamed",
+            "value": 0,
+            "contribution": -0.3706,
+            "direction": "normal"
+          },
+          {
+            "feature": "process_events",
+            "value": 0,
+            "contribution": 0.2128,
+            "direction": "ransomware"
+          }
+        ],
+        "inference_time_ms": 0.64,
+        "status": "success"
+      },
+      "correct_prediction": true,
+      "timing": {
+        "event_generation_ms": 3515.56,
+        "feature_extraction_ms": 0.0379,
+        "ml_inference_ms": 4.1607,
+        "total_pipeline_ms": 3519.83
+      },
+      "extractor_type": "real"
+    },
+    {
+      "scenario": "Ransomware-like: Rapid file modification",
+      "expected_label": 1,
+      "expected_label_name": "RANSOMWARE_LIKE",
+      "event_count": 15,
+      "full_features": {
+        "total_events": 15,
+        "file_events": 15,
+        "file_created": 0,
+        "file_modified": 15,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 15,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0,
+        "suspicious_indicators": 0
+      },
+      "ml_features_used": {
+        "total_events": 15,
+        "file_created": 0,
+        "file_modified": 15,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 15,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "excluded_features": {
+        "file_events": 15,
+        "suspicious_indicators": 0
+      },
+      "ml_result": {
+        "prediction": 1,
+        "label": "RANSOMWARE_LIKE",
+        "probability": 0.9606,
+        "above_threshold": true,
+        "threshold": 0.7,
+        "model_version": "1.0.0",
+        "feature_version": "1.0",
+        "important_features": [
+          {
+            "feature": "unique_files_modified",
+            "value": 15,
+            "contribution": 2.4147,
+            "direction": "ransomware"
+          },
+          {
+            "feature": "file_deleted",
+            "value": 0,
+            "contribution": -0.4462,
+            "direction": "normal"
+          },
+          {
+            "feature": "file_renamed",
+            "value": 0,
+            "contribution": -0.3706,
+            "direction": "normal"
+          },
+          {
+            "feature": "file_created",
+            "value": 0,
+            "contribution": 0.3626,
+            "direction": "ransomware"
+          },
+          {
+            "feature": "process_events",
+            "value": 0,
+            "contribution": 0.2128,
+            "direction": "ransomware"
+          }
+        ],
+        "inference_time_ms": 0.906,
+        "status": "success"
+      },
+      "correct_prediction": true,
+      "timing": {
+        "event_generation_ms": 969.55,
+        "feature_extraction_ms": 0.0339,
+        "ml_inference_ms": 1.9722,
+        "total_pipeline_ms": 971.61
+      },
+      "extractor_type": "real"
+    }
+  ],
+  "latency": {
+    "iterations": 100,
+    "mean_ms": 0.2879,
+    "median_ms": 0.2504,
+    "min_ms": 0.2071,
+    "max_ms": 0.8304,
+    "p95_ms": 0.491,
+    "p99_ms": 0.698
+  },
+  "overall_result": "PASS",
+  "notes": [
+    "This is baseline validation, not production certification",
+    "Model trained on 76-sample controlled dataset",
+    "Core extractor: REAL"
+  ]
+}

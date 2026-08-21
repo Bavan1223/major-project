@@ -1,0 +1,61 @@
+{
+  "gate": "9.1",
+  "timestamp": "2026-08-20T18:49:46.123244+00:00",
+  "model_version": "2.0.0",
+  "threshold": 0.7,
+  "core_extractor": "real",
+  "hash_verification": {
+    "ransomware_model.pkl": {
+      "expected": "05FB37E24302114645F45F34434D3C8E12413738CC896190514FB29C086BA5DA",
+      "actual": "05FB37E24302114645F45F34434D3C8E12413738CC896190514FB29C086BA5DA",
+      "match": true
+    },
+    "preprocessor.pkl": {
+      "expected": "D86B61EA1EB3CA8EE899504AD7CB78B9300EE616C2C72E5278B8DF150546B5FC",
+      "actual": "D86B61EA1EB3CA8EE899504AD7CB78B9300EE616C2C72E5278B8DF150546B5FC",
+      "match": true
+    },
+    "model_metadata.json": {
+      "expected": "66077304B28CCC0C9FE88F7E9263843A3EC1F25B91AB3C25C626040D46B57B08",
+      "actual": "66077304B28CCC0C9FE88F7E9263843A3EC1F25B91AB3C25C626040D46B57B08",
+      "match": true
+    }
+  },
+  "all_hashes_match": true,
+  "scenarios": {
+    "normal": {
+      "prediction": "NORMAL",
+      "probability": 0.0073
+    },
+    "ransomware": {
+      "prediction": "RANSOMWARE_LIKE",
+      "probability": 0.9934
+    },
+    "ambiguous_5": {
+      "prediction": "RANSOMWARE_LIKE",
+      "probability": 0.6368
+    },
+    "ambiguous_6": {
+      "prediction": "RANSOMWARE_LIKE",
+      "probability": 0.6664
+    },
+    "ambiguous_7": {
+      "prediction": "RANSOMWARE_LIKE",
+      "probability": 0.6796
+    }
+  },
+  "latency": {
+    "mean_ms": 0.6267,
+    "median_ms": 0.5856,
+    "min_ms": 0.5045,
+    "max_ms": 1.2633,
+    "p95_ms": 0.8726,
+    "p99_ms": 1.0709
+  },
+  "threshold_analysis": {
+    "current": 0.9,
+    "recommended": 0.7,
+    "reason": "0.70 provides equivalent validation performance with more detection headroom; ambiguous cases (0.64-0.68) remain below both thresholds"
+  },
+  "overall": "PASS"
+}

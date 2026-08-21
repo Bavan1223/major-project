@@ -1,0 +1,398 @@
+{
+    "schema_version": "1.0",
+    "feature_version": "1.0",
+    "window_seconds": 10,
+    "scenario_class": "NORMAL",
+    "label": 0,
+    "description": "Normal system behavior scenarios for ML training. Each scenario represents legitimate activity that the model must learn NOT to flag as ransomware-like.",
+    "safety": {
+        "target_directory": "~/ransomware-lab/test-files/",
+        "destructive_operations": false,
+        "real_ransomware": false
+    },
+    "scenarios": [
+        {
+            "scenario_id": "N1",
+            "name": "idle_system",
+            "purpose": "Establish zero-activity baseline. System at rest with no user actions.",
+            "label": 0,
+            "parameters": {
+                "duration_seconds": 15,
+                "file_operations": 0,
+                "process_operations": 0,
+                "network_operations": 0
+            },
+            "execution": {
+                "method": "sleep",
+                "description": "Simply wait for the observation window to pass with no activity."
+            },
+            "expected_features": {
+                "total_events": [0, 2],
+                "file_created": [0, 0],
+                "file_modified": [0, 0],
+                "file_deleted": [0, 0],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [0, 0],
+                "process_events": [0, 2],
+                "network_events": [0, 1],
+                "established_connections": [0, 1],
+                "unique_remote_ips": [0, 1]
+            },
+            "variations": [
+                {"variation_id": "N1_a", "duration_seconds": 12},
+                {"variation_id": "N1_b", "duration_seconds": 18},
+                {"variation_id": "N1_c", "duration_seconds": 25}
+            ],
+            "randomization": {
+                "strategy": "none",
+                "seed": null
+            }
+        },
+        {
+            "scenario_id": "N2",
+            "name": "light_file_editing",
+            "purpose": "Simulate user editing 1-3 files with natural pauses. Common developer behavior.",
+            "label": 0,
+            "parameters": {
+                "file_count_range": [1, 3],
+                "delay_between_ops_ms_range": [1500, 4000],
+                "operation_types": ["file_modified"],
+                "target_extensions": [".txt", ".py", ".md"]
+            },
+            "execution": {
+                "method": "sequential_file_modify",
+                "description": "Modify 1-3 files with 1.5-4 second pauses between each modification."
+            },
+            "expected_features": {
+                "total_events": [1, 5],
+                "file_created": [0, 0],
+                "file_modified": [1, 3],
+                "file_deleted": [0, 0],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [1, 3],
+                "process_events": [0, 2],
+                "network_events": [0, 1],
+                "established_connections": [0, 0],
+                "unique_remote_ips": [0, 0]
+            },
+            "variations": [
+                {"variation_id": "N2_a", "file_count": 1, "delay_ms": 3000},
+                {"variation_id": "N2_b", "file_count": 2, "delay_ms": 2000},
+                {"variation_id": "N2_c", "file_count": 3, "delay_ms": 1500},
+                {"variation_id": "N2_d", "file_count": 2, "delay_ms": 4000}
+            ],
+            "randomization": {
+                "strategy": "uniform_delay",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "N3",
+            "name": "multi_file_coding_session",
+            "purpose": "Simulate active coding: editing 4-7 files. Tests overlap zone with low-intensity ransomware.",
+            "label": 0,
+            "parameters": {
+                "file_count_range": [4, 7],
+                "delay_between_ops_ms_range": [500, 2000],
+                "operation_types": ["file_modified", "file_created"],
+                "create_probability": 0.15,
+                "target_extensions": [".py", ".js", ".txt", ".cfg"]
+            },
+            "execution": {
+                "method": "sequential_mixed_file_ops",
+                "description": "Edit 4-7 files with 0.5-2s delays. Occasionally create a new file (15% chance per operation)."
+            },
+            "expected_features": {
+                "total_events": [4, 10],
+                "file_created": [0, 2],
+                "file_modified": [4, 7],
+                "file_deleted": [0, 0],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [4, 7],
+                "process_events": [0, 2],
+                "network_events": [0, 1],
+                "established_connections": [0, 0],
+                "unique_remote_ips": [0, 0]
+            },
+            "variations": [
+                {"variation_id": "N3_a", "file_count": 4, "delay_ms": 1500},
+                {"variation_id": "N3_b", "file_count": 5, "delay_ms": 1000},
+                {"variation_id": "N3_c", "file_count": 6, "delay_ms": 800},
+                {"variation_id": "N3_d", "file_count": 7, "delay_ms": 500}
+            ],
+            "randomization": {
+                "strategy": "uniform_delay_and_file_selection",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "N4",
+            "name": "directory_organization",
+            "purpose": "Simulate file management: creating, renaming, and occasionally deleting files. Tests that rename activity alone is not suspicious.",
+            "label": 0,
+            "parameters": {
+                "create_count_range": [3, 6],
+                "rename_count_range": [2, 4],
+                "delete_count_range": [0, 2],
+                "delay_between_ops_ms_range": [300, 1500],
+                "target_extensions": [".txt", ".doc", ".bak", ".tmp"]
+            },
+            "execution": {
+                "method": "mixed_directory_ops",
+                "description": "Create files, rename some, optionally delete temporaries. Simulates folder cleanup."
+            },
+            "expected_features": {
+                "total_events": [5, 14],
+                "file_created": [3, 6],
+                "file_modified": [0, 1],
+                "file_deleted": [0, 2],
+                "file_renamed": [2, 4],
+                "unique_files_modified": [0, 1],
+                "process_events": [0, 2],
+                "network_events": [0, 0],
+                "established_connections": [0, 0],
+                "unique_remote_ips": [0, 0]
+            },
+            "variations": [
+                {"variation_id": "N4_a", "create_count": 3, "rename_count": 2, "delete_count": 0},
+                {"variation_id": "N4_b", "create_count": 5, "rename_count": 3, "delete_count": 1},
+                {"variation_id": "N4_c", "create_count": 6, "rename_count": 4, "delete_count": 2},
+                {"variation_id": "N4_d", "create_count": 4, "rename_count": 2, "delete_count": 1}
+            ],
+            "randomization": {
+                "strategy": "uniform_counts_and_delay",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "N5",
+            "name": "build_compilation",
+            "purpose": "Simulate build/compilation: many files created rapidly with process activity. HIGH legitimate activity that is NOT ransomware.",
+            "label": 0,
+            "parameters": {
+                "file_create_count_range": [8, 15],
+                "process_event_count_range": [4, 10],
+                "delay_between_ops_ms_range": [50, 200],
+                "target_extensions": [".o", ".pyc", ".class", ".tmp"]
+            },
+            "execution": {
+                "method": "rapid_file_creation_with_processes",
+                "description": "Rapidly create many output files (build artifacts) with process starts/stops. Simulates compilation."
+            },
+            "expected_features": {
+                "total_events": [12, 28],
+                "file_created": [8, 15],
+                "file_modified": [0, 2],
+                "file_deleted": [0, 1],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [0, 2],
+                "process_events": [4, 10],
+                "network_events": [0, 2],
+                "established_connections": [0, 1],
+                "unique_remote_ips": [0, 1]
+            },
+            "variations": [
+                {"variation_id": "N5_a", "file_count": 8, "process_count": 4, "delay_ms": 150},
+                {"variation_id": "N5_b", "file_count": 12, "process_count": 7, "delay_ms": 100},
+                {"variation_id": "N5_c", "file_count": 15, "process_count": 10, "delay_ms": 50},
+                {"variation_id": "N5_d", "file_count": 10, "process_count": 5, "delay_ms": 200}
+            ],
+            "randomization": {
+                "strategy": "uniform_counts",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "N6",
+            "name": "network_browsing",
+            "purpose": "Simulate web browsing: multiple network connections to various IPs with minimal file activity.",
+            "label": 0,
+            "parameters": {
+                "connection_count_range": [5, 10],
+                "unique_ip_count_range": [3, 6],
+                "file_create_count_range": [0, 2],
+                "delay_between_ops_ms_range": [200, 1000]
+            },
+            "execution": {
+                "method": "network_connections_with_minimal_files",
+                "description": "Establish connections to multiple IPs (simulated browsing). Optionally create 0-2 cache/download files."
+            },
+            "expected_features": {
+                "total_events": [5, 14],
+                "file_created": [0, 2],
+                "file_modified": [0, 1],
+                "file_deleted": [0, 0],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [0, 1],
+                "process_events": [0, 2],
+                "network_events": [5, 10],
+                "established_connections": [4, 8],
+                "unique_remote_ips": [3, 6]
+            },
+            "variations": [
+                {"variation_id": "N6_a", "connections": 5, "ips": 3, "files": 0},
+                {"variation_id": "N6_b", "connections": 7, "ips": 4, "files": 1},
+                {"variation_id": "N6_c", "connections": 10, "ips": 6, "files": 2},
+                {"variation_id": "N6_d", "connections": 6, "ips": 5, "files": 0}
+            ],
+            "randomization": {
+                "strategy": "uniform_counts_and_ips",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "N7",
+            "name": "file_download_save",
+            "purpose": "Simulate downloading files: network activity paired with file creation. Legitimate network + file combined behavior.",
+            "label": 0,
+            "parameters": {
+                "download_count_range": [3, 6],
+                "unique_ip_range": [1, 3],
+                "delay_between_ops_ms_range": [500, 2000],
+                "target_extensions": [".pdf", ".zip", ".tar.gz", ".png"]
+            },
+            "execution": {
+                "method": "network_then_file_create",
+                "description": "For each download: establish connection, then create file. Sequential with pauses."
+            },
+            "expected_features": {
+                "total_events": [6, 14],
+                "file_created": [3, 6],
+                "file_modified": [0, 1],
+                "file_deleted": [0, 0],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [0, 1],
+                "process_events": [0, 2],
+                "network_events": [3, 6],
+                "established_connections": [3, 6],
+                "unique_remote_ips": [1, 3]
+            },
+            "variations": [
+                {"variation_id": "N7_a", "downloads": 3, "ips": 1, "delay_ms": 1500},
+                {"variation_id": "N7_b", "downloads": 4, "ips": 2, "delay_ms": 1000},
+                {"variation_id": "N7_c", "downloads": 6, "ips": 3, "delay_ms": 500},
+                {"variation_id": "N7_d", "downloads": 5, "ips": 2, "delay_ms": 800}
+            ],
+            "randomization": {
+                "strategy": "uniform_counts",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "N8",
+            "name": "log_rotation_repeated_writes",
+            "purpose": "CRITICAL: High file_modified count but LOW unique_files_modified. Simulates logging or database writes to the same file repeatedly. Must NOT be flagged as ransomware.",
+            "label": 0,
+            "parameters": {
+                "write_count_range": [10, 25],
+                "unique_file_count": [1, 2],
+                "delay_between_ops_ms_range": [200, 800],
+                "target_extensions": [".log", ".db", ".tmp"]
+            },
+            "execution": {
+                "method": "repeated_single_file_modify",
+                "description": "Modify the same 1-2 files repeatedly (10-25 times). High modification count, very low unique file count."
+            },
+            "expected_features": {
+                "total_events": [10, 27],
+                "file_created": [0, 1],
+                "file_modified": [10, 25],
+                "file_deleted": [0, 0],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [1, 2],
+                "process_events": [0, 2],
+                "network_events": [0, 1],
+                "established_connections": [0, 0],
+                "unique_remote_ips": [0, 0]
+            },
+            "variations": [
+                {"variation_id": "N8_a", "writes": 10, "unique_files": 1, "delay_ms": 500},
+                {"variation_id": "N8_b", "writes": 15, "unique_files": 1, "delay_ms": 400},
+                {"variation_id": "N8_c", "writes": 20, "unique_files": 2, "delay_ms": 300},
+                {"variation_id": "N8_d", "writes": 25, "unique_files": 2, "delay_ms": 200}
+            ],
+            "randomization": {
+                "strategy": "fixed_files_varied_timing",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "N9",
+            "name": "mixed_high_activity_normal",
+            "purpose": "Busy developer workstation: concurrent file editing, process activity, and network connections. HIGH total activity that is legitimate.",
+            "label": 0,
+            "parameters": {
+                "file_modify_count_range": [3, 6],
+                "file_create_count_range": [2, 4],
+                "process_event_count_range": [3, 8],
+                "network_event_count_range": [3, 6],
+                "unique_ip_range": [2, 4],
+                "delay_between_ops_ms_range": [100, 500]
+            },
+            "execution": {
+                "method": "interleaved_multi_source",
+                "description": "Interleave file operations, process events, and network connections. Simulates busy workstation."
+            },
+            "expected_features": {
+                "total_events": [12, 28],
+                "file_created": [2, 4],
+                "file_modified": [3, 6],
+                "file_deleted": [0, 1],
+                "file_renamed": [0, 1],
+                "unique_files_modified": [3, 6],
+                "process_events": [3, 8],
+                "network_events": [3, 6],
+                "established_connections": [2, 5],
+                "unique_remote_ips": [2, 4]
+            },
+            "variations": [
+                {"variation_id": "N9_a", "file_mod": 3, "file_create": 2, "process": 3, "network": 3},
+                {"variation_id": "N9_b", "file_mod": 5, "file_create": 3, "process": 5, "network": 4},
+                {"variation_id": "N9_c", "file_mod": 6, "file_create": 4, "process": 8, "network": 6},
+                {"variation_id": "N9_d", "file_mod": 4, "file_create": 3, "process": 6, "network": 5}
+            ],
+            "randomization": {
+                "strategy": "uniform_interleaved",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "N10",
+            "name": "batch_file_creation_archive_extract",
+            "purpose": "Legitimate rapid file creation burst (archive extraction). HIGH file_created but LOW file_modified. Distinguishes from ransomware which MODIFIES existing files.",
+            "label": 0,
+            "parameters": {
+                "file_create_count_range": [10, 22],
+                "file_modify_count_range": [0, 2],
+                "delay_between_ops_ms_range": [20, 100],
+                "target_extensions": [".txt", ".html", ".css", ".js", ".png", ".json"]
+            },
+            "execution": {
+                "method": "rapid_batch_create",
+                "description": "Create 10-22 files rapidly (simulating tar/zip extraction). Minimal modification."
+            },
+            "expected_features": {
+                "total_events": [10, 25],
+                "file_created": [10, 22],
+                "file_modified": [0, 2],
+                "file_deleted": [0, 0],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [0, 2],
+                "process_events": [0, 2],
+                "network_events": [0, 1],
+                "established_connections": [0, 0],
+                "unique_remote_ips": [0, 0]
+            },
+            "variations": [
+                {"variation_id": "N10_a", "file_count": 10, "delay_ms": 80},
+                {"variation_id": "N10_b", "file_count": 15, "delay_ms": 50},
+                {"variation_id": "N10_c", "file_count": 20, "delay_ms": 30},
+                {"variation_id": "N10_d", "file_count": 22, "delay_ms": 20}
+            ],
+            "randomization": {
+                "strategy": "uniform_counts",
+                "seed": "per_session"
+            }
+        }
+    ]
+}

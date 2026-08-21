@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment / secrets
+.env
+.env.*
+
+# Generated logs
+logs/*.jsonl
+
+# Generated test files
+test-files/*
+!test-files/.gitkeep
+
+# Temporary / backup files
+*.disabled
+*.backup
+*.gate10_backup
+*.bak
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

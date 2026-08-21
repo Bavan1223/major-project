@@ -1,0 +1,241 @@
+{
+    "feature_version": "1.0",
+    "observation_window_seconds": 10,
+    "description": "Behavioral feature contract for ML-based ransomware detection. Defines the exact features consumed by the ML model, their types, sources, and semantics.",
+    "classification": {
+        "type": "binary",
+        "labels": {
+            "0": "NORMAL",
+            "1": "RANSOMWARE_LIKE"
+        },
+        "label_description": "0 = normal system behavior within the observation window. 1 = behavioral pattern associated with ransomware-like activity within the observation window."
+    },
+    "ml_features": [
+        {
+            "name": "total_events",
+            "index": 0,
+            "dtype": "int",
+            "source": "all_monitors",
+            "description": "Total number of events from all monitors within the observation window.",
+            "formula": "count(all events in window)",
+            "event_types_counted": ["file_created", "file_modified", "file_deleted", "file_renamed", "process_started", "process_ended", "connection_established", "connection_closed"],
+            "ransomware_relevance": "Ransomware generates abnormally high total event volume due to rapid file operations combined with process and network activity.",
+            "currently_available": true,
+            "requires_core_changes": false,
+            "min_value": 0,
+            "typical_normal_range": "0-20",
+            "typical_suspicious_range": "30+"
+        },
+        {
+            "name": "file_created",
+            "index": 1,
+            "dtype": "int",
+            "source": "file_monitor",
+            "description": "Number of file creation events within the observation window.",
+            "formula": "count(events where event_type == 'file_created')",
+            "event_types_counted": ["file_created"],
+            "ransomware_relevance": "Ransomware may create encrypted copies of files or ransom note files. High creation rate from a single process is suspicious.",
+            "currently_available": true,
+            "requires_core_changes": false,
+            "min_value": 0,
+            "typical_normal_range": "0-5",
+            "typical_suspicious_range": "10+"
+        },
+        {
+            "name": "file_modified",
+            "index": 2,
+            "dtype": "int",
+            "source": "file_monitor",
+            "description": "Number of file modification events within the observation window.",
+            "formula": "count(events where event_type == 'file_modified')",
+            "event_types_counted": ["file_modified"],
+            "ransomware_relevance": "Core ransomware behavior — encrypting files in place registers as modification. Rapid modification of many files is a primary indicator.",
+            "currently_available": true,
+            "requires_core_changes": false,
+            "min_value": 0,
+            "typical_normal_range": "0-5",
+            "typical_suspicious_range": "10+"
+        },
+        {
+            "name": "file_deleted",
+            "index": 3,
+            "dtype": "int",
+            "source": "file_monitor",
+            "description": "Number of file deletion events within the observation window.",
+            "formula": "count(events where event_type == 'file_deleted')",
+            "event_types_counted": ["file_deleted"],
+            "ransomware_relevance": "Some ransomware deletes original files after creating encrypted copies. Bulk deletion paired with creation is suspicious.",
+            "currently_available": true,
+            "requires_core_changes": false,
+            "min_value": 0,
+            "typical_normal_range": "0-2",
+            "typical_suspicious_range": "5+"
+        },
+        {
+            "name": "file_renamed",
+            "index": 4,
+            "dtype": "int",
+            "source": "file_monitor",
+            "description": "Number of file rename events within the observation window.",
+            "formula": "count(events where event_type == 'file_renamed')",
+            "event_types_counted": ["file_renamed"],
+            "ransomware_relevance": "Ransomware commonly renames files with new extensions (e.g., .encrypted, .locked). Bulk renaming is a strong behavioral signal.",
+            "currently_available": true,
+            "requires_core_changes": false,
+            "min_value": 0,
+            "typical_normal_range": "0-2",
+            "typical_suspicious_range": "5+"
+        },
+        {
+            "name": "unique_files_modified",
+            "index": 5,
+            "dtype": "int",
+            "source": "file_monitor",
+            "description": "Number of distinct files that were modified within the observation window.",
+            "formula": "count(distinct file paths where event_type == 'file_modified')",
+            "event_types_counted": ["file_modified"],
+            "ransomware_relevance": "Key discriminator — ransomware targets many different files. A legitimate process may modify the same file repeatedly, but ransomware spreads across unique targets.",
+            "currently_available": true,
+            "requires_core_changes": false,
+            "min_value": 0,
+            "typical_normal_range": "0-5",
+            "typical_suspicious_range": "10+"
+        },
+        {
+            "name": "process_events",
+            "index": 6,
+            "dtype": "int",
+            "source": "process_monitor",
+            "description": "Total number of process-related events within the observation window.",
+            "formula": "count(events where source == 'process_monitor')",
+            "event_types_counted": ["process_started", "process_ended"],
+            "ransomware_relevance": "Ransomware may spawn child processes for parallel encryption or use helper processes. Abnormal process churn combined with file activity is suspicious.",
+            "currently_available": true,
+            "requires_core_changes": false,
+            "min_value": 0,
+            "typical_normal_range": "0-10",
+            "typical_suspicious_range": "varies"
+        },
+        {
+            "name": "network_events",
+            "index": 7,
+            "dtype": "int",
+            "source": "network_monitor",
+            "description": "Total number of network-related events within the observation window.",
+            "formula": "count(events where source == 'network_monitor')",
+            "event_types_counted": ["connection_established", "connection_closed", "data_sent", "data_received"],
+            "ransomware_relevance": "Ransomware may communicate with C2 servers, exfiltrate data before encryption, or download encryption keys. Network activity concurrent with file operations is suspicious.",
+            "currently_available": true,
+            "requires_core_changes": false,
+            "min_value": 0,
+            "typical_normal_range": "0-10",
+            "typical_suspicious_range": "varies"
+        },
+        {
+            "name": "established_connections",
+            "index": 8,
+            "dtype": "int",
+            "source": "network_monitor",
+            "description": "Number of successfully established network connections within the observation window.",
+            "formula": "count(events where event_type == 'connection_established' and state == 'ESTABLISHED')",
+            "event_types_counted": ["connection_established"],
+            "ransomware_relevance": "Active outbound connections during file encryption activity may indicate C2 communication or data exfiltration.",
+            "currently_available": true,
+            "requires_core_changes": false,
+            "min_value": 0,
+            "typical_normal_range": "0-5",
+            "typical_suspicious_range": "varies"
+        },
+        {
+            "name": "unique_remote_ips",
+            "index": 9,
+            "dtype": "int",
+            "source": "network_monitor",
+            "description": "Number of distinct remote IP addresses contacted within the observation window.",
+            "formula": "count(distinct remote IPs from network events)",
+            "event_types_counted": ["connection_established"],
+            "ransomware_relevance": "Contacting many unique remote IPs may indicate scanning, C2 failover, or distributed exfiltration. Combined with high file activity, this strengthens the ransomware signal.",
+            "currently_available": true,
+            "requires_core_changes": false,
+            "min_value": 0,
+            "typical_normal_range": "0-3",
+            "typical_suspicious_range": "5+"
+        }
+    ],
+    "excluded_features": [
+        {
+            "name": "file_events",
+            "reason": "REDUNDANT",
+            "explanation": "This is the sum of file_created + file_modified + file_deleted + file_renamed. Including both the aggregate and its components introduces multicollinearity without adding information. The individual components are more informative for the model because they distinguish between different file operation types, which have different ransomware relevance.",
+            "source": "feature_extractor.py",
+            "currently_produced": true
+        },
+        {
+            "name": "suspicious_indicators",
+            "reason": "CIRCULAR_REASONING",
+            "explanation": "This feature is derived from the rule-based detection engine (e.g., 10 unique files modified in 10 seconds triggers a suspicious indicator). Using it as ML input would mean the model learns to replicate the rule rather than discovering independent behavioral patterns. The ML model must demonstrate value beyond the existing rules. See suspicious_indicators_decision.md for full rationale.",
+            "source": "feature_extractor.py / detection_engine.py",
+            "currently_produced": true
+        }
+    ],
+    "proposed_future_features": [
+        {
+            "name": "file_modification_rate",
+            "formula": "unique_files_modified / observation_window_seconds",
+            "dtype": "float",
+            "source": "derived from file_monitor features",
+            "requires_core_changes": true,
+            "rationale": "Normalizes file modification count by window duration, enabling comparison across different window sizes.",
+            "status": "PROPOSED — requires approval before implementation"
+        },
+        {
+            "name": "file_ops_per_process",
+            "formula": "(file_created + file_modified + file_deleted + file_renamed) / max(process_events, 1)",
+            "dtype": "float",
+            "source": "derived from file_monitor + process_monitor features",
+            "requires_core_changes": true,
+            "rationale": "Ransomware typically shows high file operations concentrated in few processes. This ratio captures that concentration.",
+            "status": "PROPOSED — requires approval before implementation"
+        },
+        {
+            "name": "rename_to_modify_ratio",
+            "formula": "file_renamed / max(file_modified, 1)",
+            "dtype": "float",
+            "source": "derived from file_monitor features",
+            "requires_core_changes": true,
+            "rationale": "Ransomware that encrypts-then-renames shows a high rename-to-modify ratio compared to normal editing which rarely renames.",
+            "status": "PROPOSED — requires approval before implementation"
+        },
+        {
+            "name": "delete_to_create_ratio",
+            "formula": "file_deleted / max(file_created, 1)",
+            "dtype": "float",
+            "source": "derived from file_monitor features",
+            "requires_core_changes": true,
+            "rationale": "Ransomware that creates encrypted copies then deletes originals shows balanced delete/create counts. Normal behavior rarely shows this pattern.",
+            "status": "PROPOSED — requires approval before implementation"
+        },
+        {
+            "name": "network_file_ratio",
+            "formula": "network_events / max(file_created + file_modified + file_deleted + file_renamed, 1)",
+            "dtype": "float",
+            "source": "derived from network_monitor + file_monitor features",
+            "requires_core_changes": true,
+            "rationale": "Captures the relationship between network and file activity. Exfiltration-before-encryption shows network activity proportional to file operations.",
+            "status": "PROPOSED — requires approval before implementation"
+        }
+    ],
+    "validation_rules": {
+        "all_features_must_be_non_negative": true,
+        "all_features_must_be_integer": true,
+        "feature_count_must_equal": 10,
+        "feature_order_must_match_ml_feature_columns": true,
+        "missing_values_not_permitted": true
+    },
+    "compatibility_notes": {
+        "feature_extractor_produces": 12,
+        "ml_model_consumes": 10,
+        "difference": "2 features excluded (file_events, suspicious_indicators)",
+        "mapping": "ML preprocessing selects the 10 ML_FEATURE_COLUMNS from the full 12-feature output of feature_extractor.py"
+    }
+}

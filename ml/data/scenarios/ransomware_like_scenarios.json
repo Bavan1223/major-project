@@ -1,0 +1,407 @@
+{
+    "schema_version": "1.0",
+    "feature_version": "1.0",
+    "window_seconds": 10,
+    "scenario_class": "RANSOMWARE_LIKE",
+    "label": 1,
+    "description": "Controlled ransomware-like behavioral scenarios for ML training. These simulate behavioral patterns associated with ransomware using safe, non-destructive operations on disposable test files.",
+    "safety": {
+        "target_directory": "~/ransomware-lab/test-files/",
+        "destructive_operations": false,
+        "real_ransomware": false,
+        "real_encryption": false,
+        "note": "All modifications write dummy content (random bytes or known strings). No actual encryption algorithm is used."
+    },
+    "scenarios": [
+        {
+            "scenario_id": "R1",
+            "name": "rapid_modify_low_intensity",
+            "purpose": "Low-end ransomware-like behavior: modify 8-12 unique files quickly. Overlaps with N3 upper range to test model sensitivity.",
+            "label": 1,
+            "parameters": {
+                "file_count_range": [8, 12],
+                "delay_between_ops_ms_range": [100, 500],
+                "operation_types": ["file_modified"],
+                "target_extensions": [".txt", ".doc", ".pdf", ".csv"]
+            },
+            "execution": {
+                "method": "rapid_unique_file_modify",
+                "description": "Modify 8-12 different files rapidly. Each file is unique (ransomware spreads across targets)."
+            },
+            "expected_features": {
+                "total_events": [8, 14],
+                "file_created": [0, 1],
+                "file_modified": [8, 12],
+                "file_deleted": [0, 0],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [8, 12],
+                "process_events": [0, 2],
+                "network_events": [0, 1],
+                "established_connections": [0, 0],
+                "unique_remote_ips": [0, 0]
+            },
+            "variations": [
+                {"variation_id": "R1_a", "file_count": 8, "delay_ms": 400},
+                {"variation_id": "R1_b", "file_count": 10, "delay_ms": 300},
+                {"variation_id": "R1_c", "file_count": 12, "delay_ms": 100},
+                {"variation_id": "R1_d", "file_count": 9, "delay_ms": 500}
+            ],
+            "randomization": {
+                "strategy": "uniform_file_selection_and_delay",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "R2",
+            "name": "rapid_modify_high_intensity",
+            "purpose": "Clear high-intensity ransomware pattern: modify 20-30 unique files very quickly. Should be easily detectable.",
+            "label": 1,
+            "parameters": {
+                "file_count_range": [20, 30],
+                "delay_between_ops_ms_range": [10, 100],
+                "operation_types": ["file_modified"],
+                "target_extensions": [".txt", ".doc", ".pdf", ".xlsx", ".py", ".jpg"]
+            },
+            "execution": {
+                "method": "rapid_unique_file_modify",
+                "description": "Modify 20-30 different files as fast as possible. Simulates aggressive encryption sweep."
+            },
+            "expected_features": {
+                "total_events": [20, 34],
+                "file_created": [0, 2],
+                "file_modified": [20, 30],
+                "file_deleted": [0, 0],
+                "file_renamed": [0, 2],
+                "unique_files_modified": [20, 30],
+                "process_events": [0, 2],
+                "network_events": [0, 2],
+                "established_connections": [0, 1],
+                "unique_remote_ips": [0, 1]
+            },
+            "variations": [
+                {"variation_id": "R2_a", "file_count": 20, "delay_ms": 80},
+                {"variation_id": "R2_b", "file_count": 25, "delay_ms": 50},
+                {"variation_id": "R2_c", "file_count": 30, "delay_ms": 20},
+                {"variation_id": "R2_d", "file_count": 22, "delay_ms": 100}
+            ],
+            "randomization": {
+                "strategy": "uniform_file_selection",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "R3",
+            "name": "encrypt_and_rename",
+            "purpose": "Classic ransomware signature: modify file (encrypt content) then rename with suspicious extension.",
+            "label": 1,
+            "parameters": {
+                "file_count_range": [8, 15],
+                "delay_between_ops_ms_range": [50, 200],
+                "operation_types": ["file_modified", "file_renamed"],
+                "rename_extensions": [".encrypted", ".locked", ".cry", ".enc", ".WNCRY"],
+                "target_extensions": [".txt", ".doc", ".pdf", ".py", ".csv"]
+            },
+            "execution": {
+                "method": "modify_then_rename",
+                "description": "For each target: modify content (write dummy bytes), then rename with ransomware-like extension."
+            },
+            "expected_features": {
+                "total_events": [16, 32],
+                "file_created": [0, 1],
+                "file_modified": [8, 15],
+                "file_deleted": [0, 0],
+                "file_renamed": [8, 15],
+                "unique_files_modified": [8, 15],
+                "process_events": [0, 2],
+                "network_events": [0, 1],
+                "established_connections": [0, 0],
+                "unique_remote_ips": [0, 0]
+            },
+            "variations": [
+                {"variation_id": "R3_a", "file_count": 8, "delay_ms": 150, "extension": ".encrypted"},
+                {"variation_id": "R3_b", "file_count": 10, "delay_ms": 100, "extension": ".locked"},
+                {"variation_id": "R3_c", "file_count": 15, "delay_ms": 50, "extension": ".cry"},
+                {"variation_id": "R3_d", "file_count": 12, "delay_ms": 80, "extension": ".enc"}
+            ],
+            "randomization": {
+                "strategy": "uniform_file_and_extension_selection",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "R4",
+            "name": "create_encrypted_delete_original",
+            "purpose": "Alternative ransomware pattern: create new encrypted file, delete original. Different operational signature from R3.",
+            "label": 1,
+            "parameters": {
+                "file_count_range": [8, 15],
+                "delay_between_ops_ms_range": [50, 200],
+                "operation_types": ["file_created", "file_deleted"],
+                "target_extensions": [".txt", ".doc", ".pdf", ".csv"]
+            },
+            "execution": {
+                "method": "create_new_then_delete_original",
+                "description": "For each target: create a new file (simulated encrypted copy), then delete the original."
+            },
+            "expected_features": {
+                "total_events": [16, 32],
+                "file_created": [8, 15],
+                "file_modified": [0, 2],
+                "file_deleted": [8, 15],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [0, 2],
+                "process_events": [0, 2],
+                "network_events": [0, 1],
+                "established_connections": [0, 0],
+                "unique_remote_ips": [0, 0]
+            },
+            "variations": [
+                {"variation_id": "R4_a", "file_count": 8, "delay_ms": 150},
+                {"variation_id": "R4_b", "file_count": 10, "delay_ms": 100},
+                {"variation_id": "R4_c", "file_count": 15, "delay_ms": 50},
+                {"variation_id": "R4_d", "file_count": 12, "delay_ms": 80}
+            ],
+            "randomization": {
+                "strategy": "uniform_file_selection",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "R5",
+            "name": "burst_all_operations",
+            "purpose": "Chaotic ransomware behavior: rapid mix of all file operation types simultaneously.",
+            "label": 1,
+            "parameters": {
+                "total_ops_range": [15, 30],
+                "operation_mix": {
+                    "file_created": 0.20,
+                    "file_modified": 0.40,
+                    "file_deleted": 0.20,
+                    "file_renamed": 0.20
+                },
+                "delay_between_ops_ms_range": [20, 100],
+                "target_extensions": [".txt", ".doc", ".pdf", ".py", ".log"]
+            },
+            "execution": {
+                "method": "random_mixed_file_burst",
+                "description": "Randomly select operation type per iteration. Execute all types in rapid burst."
+            },
+            "expected_features": {
+                "total_events": [15, 34],
+                "file_created": [3, 7],
+                "file_modified": [5, 12],
+                "file_deleted": [3, 7],
+                "file_renamed": [3, 7],
+                "unique_files_modified": [5, 12],
+                "process_events": [0, 2],
+                "network_events": [0, 2],
+                "established_connections": [0, 1],
+                "unique_remote_ips": [0, 1]
+            },
+            "variations": [
+                {"variation_id": "R5_a", "total_ops": 15, "delay_ms": 80},
+                {"variation_id": "R5_b", "total_ops": 20, "delay_ms": 50},
+                {"variation_id": "R5_c", "total_ops": 25, "delay_ms": 30},
+                {"variation_id": "R5_d", "total_ops": 30, "delay_ms": 20}
+            ],
+            "randomization": {
+                "strategy": "weighted_random_operation_type",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "R6",
+            "name": "slow_encryption_low_intensity",
+            "purpose": "CRITICAL: Stealthier ransomware — modify 5-8 unique files spread across the full window. Overlaps with N3. Model must detect subtle patterns.",
+            "label": 1,
+            "parameters": {
+                "file_count_range": [5, 8],
+                "delay_between_ops_ms_range": [1000, 2000],
+                "operation_types": ["file_modified"],
+                "target_extensions": [".txt", ".doc", ".pdf", ".csv"]
+            },
+            "execution": {
+                "method": "slow_unique_file_modify",
+                "description": "Modify 5-8 different files with 1-2 second gaps. Simulates stealthy/slower ransomware."
+            },
+            "expected_features": {
+                "total_events": [5, 10],
+                "file_created": [0, 0],
+                "file_modified": [5, 8],
+                "file_deleted": [0, 0],
+                "file_renamed": [0, 0],
+                "unique_files_modified": [5, 8],
+                "process_events": [0, 2],
+                "network_events": [0, 1],
+                "established_connections": [0, 0],
+                "unique_remote_ips": [0, 0]
+            },
+            "variations": [
+                {"variation_id": "R6_a", "file_count": 5, "delay_ms": 1800},
+                {"variation_id": "R6_b", "file_count": 6, "delay_ms": 1500},
+                {"variation_id": "R6_c", "file_count": 7, "delay_ms": 1200},
+                {"variation_id": "R6_d", "file_count": 8, "delay_ms": 1000}
+            ],
+            "randomization": {
+                "strategy": "uniform_file_selection_and_delay",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "R7",
+            "name": "process_spawn_encrypt",
+            "purpose": "Multi-process ransomware: spawn child processes that each modify files. Process + file combined pattern.",
+            "label": 1,
+            "parameters": {
+                "process_count_range": [3, 6],
+                "files_per_process_range": [3, 5],
+                "delay_between_ops_ms_range": [50, 150],
+                "target_extensions": [".txt", ".doc", ".pdf"]
+            },
+            "execution": {
+                "method": "multi_process_file_modify",
+                "description": "Spawn 3-6 child processes, each modifying 3-5 unique files. Simulates parallel encryption."
+            },
+            "expected_features": {
+                "total_events": [12, 36],
+                "file_created": [0, 2],
+                "file_modified": [9, 25],
+                "file_deleted": [0, 1],
+                "file_renamed": [0, 2],
+                "unique_files_modified": [9, 25],
+                "process_events": [3, 6],
+                "network_events": [0, 2],
+                "established_connections": [0, 1],
+                "unique_remote_ips": [0, 1]
+            },
+            "variations": [
+                {"variation_id": "R7_a", "processes": 3, "files_per": 3, "delay_ms": 120},
+                {"variation_id": "R7_b", "processes": 4, "files_per": 4, "delay_ms": 100},
+                {"variation_id": "R7_c", "processes": 5, "files_per": 5, "delay_ms": 60},
+                {"variation_id": "R7_d", "processes": 6, "files_per": 3, "delay_ms": 80}
+            ],
+            "randomization": {
+                "strategy": "uniform_process_and_file_selection",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "R8",
+            "name": "network_exfiltration_encrypt",
+            "purpose": "Multi-vector ransomware: network connections (C2/exfil) concurrent with file modifications. Distinguishes from N6 (network-only) and N7 (network + create).",
+            "label": 1,
+            "parameters": {
+                "file_modify_count_range": [10, 18],
+                "network_connection_count_range": [3, 6],
+                "unique_ip_range": [2, 4],
+                "delay_between_ops_ms_range": [50, 200],
+                "target_extensions": [".txt", ".doc", ".pdf", ".xlsx"]
+            },
+            "execution": {
+                "method": "interleaved_network_and_file_modify",
+                "description": "Interleave network connections with file modifications. Simulates exfiltration + encryption."
+            },
+            "expected_features": {
+                "total_events": [13, 26],
+                "file_created": [0, 1],
+                "file_modified": [10, 18],
+                "file_deleted": [0, 1],
+                "file_renamed": [0, 2],
+                "unique_files_modified": [10, 18],
+                "process_events": [0, 2],
+                "network_events": [3, 6],
+                "established_connections": [3, 6],
+                "unique_remote_ips": [2, 4]
+            },
+            "variations": [
+                {"variation_id": "R8_a", "files": 10, "connections": 3, "ips": 2, "delay_ms": 150},
+                {"variation_id": "R8_b", "files": 12, "connections": 4, "ips": 3, "delay_ms": 100},
+                {"variation_id": "R8_c", "files": 15, "connections": 5, "ips": 3, "delay_ms": 70},
+                {"variation_id": "R8_d", "files": 18, "connections": 6, "ips": 4, "delay_ms": 50}
+            ],
+            "randomization": {
+                "strategy": "uniform_interleaved",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "R9",
+            "name": "multi_vector_combined",
+            "purpose": "Full multi-dimensional ransomware: elevated file modification + process spawning + network activity combined.",
+            "label": 1,
+            "parameters": {
+                "file_modify_count_range": [8, 15],
+                "process_event_count_range": [3, 7],
+                "network_event_count_range": [3, 5],
+                "unique_ip_range": [2, 3],
+                "delay_between_ops_ms_range": [50, 150],
+                "target_extensions": [".txt", ".doc", ".pdf", ".py"]
+            },
+            "execution": {
+                "method": "interleaved_all_sources",
+                "description": "Interleave file modifications, process events, and network connections. All three channels active."
+            },
+            "expected_features": {
+                "total_events": [14, 30],
+                "file_created": [0, 2],
+                "file_modified": [8, 15],
+                "file_deleted": [0, 2],
+                "file_renamed": [0, 2],
+                "unique_files_modified": [8, 15],
+                "process_events": [3, 7],
+                "network_events": [3, 5],
+                "established_connections": [2, 4],
+                "unique_remote_ips": [2, 3]
+            },
+            "variations": [
+                {"variation_id": "R9_a", "files": 8, "processes": 3, "network": 3, "ips": 2},
+                {"variation_id": "R9_b", "files": 10, "processes": 4, "network": 4, "ips": 2},
+                {"variation_id": "R9_c", "files": 12, "processes": 5, "network": 4, "ips": 3},
+                {"variation_id": "R9_d", "files": 15, "processes": 7, "network": 5, "ips": 3}
+            ],
+            "randomization": {
+                "strategy": "uniform_interleaved_all",
+                "seed": "per_session"
+            }
+        },
+        {
+            "scenario_id": "R10",
+            "name": "rename_only_burst",
+            "purpose": "Alternative ransomware signature: rapid bulk renaming without modification. Represents extension-change attacks where files are renamed but content left intact until later.",
+            "label": 1,
+            "parameters": {
+                "file_count_range": [12, 22],
+                "delay_between_ops_ms_range": [20, 100],
+                "operation_types": ["file_renamed"],
+                "rename_extensions": [".locked", ".encrypted", ".CRYPTED", ".paying"],
+                "target_extensions": [".txt", ".doc", ".pdf", ".py", ".jpg", ".csv"]
+            },
+            "execution": {
+                "method": "rapid_bulk_rename",
+                "description": "Rename 12-22 files rapidly with ransomware-like extensions. No modification step."
+            },
+            "expected_features": {
+                "total_events": [12, 24],
+                "file_created": [0, 1],
+                "file_modified": [0, 2],
+                "file_deleted": [0, 0],
+                "file_renamed": [12, 22],
+                "unique_files_modified": [0, 2],
+                "process_events": [0, 2],
+                "network_events": [0, 1],
+                "established_connections": [0, 0],
+                "unique_remote_ips": [0, 0]
+            },
+            "variations": [
+                {"variation_id": "R10_a", "file_count": 12, "delay_ms": 80, "extension": ".locked"},
+                {"variation_id": "R10_b", "file_count": 15, "delay_ms": 50, "extension": ".encrypted"},
+                {"variation_id": "R10_c", "file_count": 18, "delay_ms": 30, "extension": ".CRYPTED"},
+                {"variation_id": "R10_d", "file_count": 22, "delay_ms": 20, "extension": ".paying"}
+            ],
+            "randomization": {
+                "strategy": "uniform_file_selection",
+                "seed": "per_session"
+            }
+        }
+    ]
+}

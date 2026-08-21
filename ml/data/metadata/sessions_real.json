@@ -1,0 +1,3071 @@
+{
+  "dataset_version": "1.0",
+  "feature_version": "1.0",
+  "collection_date": "2026-08-20T18:21:40.001626+00:00",
+  "extractor": "core.feature_extractor.extract_features (REAL)",
+  "total_sessions": 120,
+  "total_records": 120,
+  "errors": [],
+  "sessions": [
+    {
+      "session_id": "S_0001",
+      "scenario_id": "N1",
+      "label": 0,
+      "variation": {
+        "duration_s": 12
+      },
+      "start_time": "2026-08-20T18:18:04.539130+00:00",
+      "end_time": "2026-08-20T18:18:19.540251+00:00",
+      "event_count": 0,
+      "features": {
+        "total_events": 0,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0002",
+      "scenario_id": "N1",
+      "label": 0,
+      "variation": {
+        "duration_s": 15
+      },
+      "start_time": "2026-08-20T18:18:19.540390+00:00",
+      "end_time": "2026-08-20T18:18:34.540625+00:00",
+      "event_count": 0,
+      "features": {
+        "total_events": 0,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0003",
+      "scenario_id": "N1",
+      "label": 0,
+      "variation": {
+        "duration_s": 18
+      },
+      "start_time": "2026-08-20T18:18:34.540748+00:00",
+      "end_time": "2026-08-20T18:18:49.541226+00:00",
+      "event_count": 0,
+      "features": {
+        "total_events": 0,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0004",
+      "scenario_id": "N1",
+      "label": 0,
+      "variation": {
+        "duration_s": 20
+      },
+      "start_time": "2026-08-20T18:18:49.541419+00:00",
+      "end_time": "2026-08-20T18:19:04.541836+00:00",
+      "event_count": 0,
+      "features": {
+        "total_events": 0,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0005",
+      "scenario_id": "N1",
+      "label": 0,
+      "variation": {
+        "duration_s": 13
+      },
+      "start_time": "2026-08-20T18:19:04.541961+00:00",
+      "end_time": "2026-08-20T18:19:19.542156+00:00",
+      "event_count": 0,
+      "features": {
+        "total_events": 0,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0006",
+      "scenario_id": "N1",
+      "label": 0,
+      "variation": {
+        "duration_s": 16
+      },
+      "start_time": "2026-08-20T18:19:19.542245+00:00",
+      "end_time": "2026-08-20T18:19:34.542598+00:00",
+      "event_count": 0,
+      "features": {
+        "total_events": 0,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0007",
+      "scenario_id": "N2",
+      "label": 0,
+      "variation": {
+        "file_count": 1,
+        "delay_s": 3.0
+      },
+      "start_time": "2026-08-20T18:19:34.542732+00:00",
+      "end_time": "2026-08-20T18:19:34.643534+00:00",
+      "event_count": 1,
+      "features": {
+        "total_events": 1,
+        "file_created": 0,
+        "file_modified": 1,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 1,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0008",
+      "scenario_id": "N2",
+      "label": 0,
+      "variation": {
+        "file_count": 2,
+        "delay_s": 2.0
+      },
+      "start_time": "2026-08-20T18:19:34.643821+00:00",
+      "end_time": "2026-08-20T18:19:34.875961+00:00",
+      "event_count": 2,
+      "features": {
+        "total_events": 2,
+        "file_created": 0,
+        "file_modified": 2,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 2,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0009",
+      "scenario_id": "N2",
+      "label": 0,
+      "variation": {
+        "file_count": 3,
+        "delay_s": 1.5
+      },
+      "start_time": "2026-08-20T18:19:34.876197+00:00",
+      "end_time": "2026-08-20T18:19:35.178283+00:00",
+      "event_count": 3,
+      "features": {
+        "total_events": 3,
+        "file_created": 0,
+        "file_modified": 3,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 3,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0010",
+      "scenario_id": "N2",
+      "label": 0,
+      "variation": {
+        "file_count": 2,
+        "delay_s": 2.5
+      },
+      "start_time": "2026-08-20T18:19:35.178533+00:00",
+      "end_time": "2026-08-20T18:19:35.380147+00:00",
+      "event_count": 2,
+      "features": {
+        "total_events": 2,
+        "file_created": 0,
+        "file_modified": 2,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 2,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0011",
+      "scenario_id": "N2",
+      "label": 0,
+      "variation": {
+        "file_count": 1,
+        "delay_s": 2.0
+      },
+      "start_time": "2026-08-20T18:19:35.380793+00:00",
+      "end_time": "2026-08-20T18:19:35.481326+00:00",
+      "event_count": 1,
+      "features": {
+        "total_events": 1,
+        "file_created": 0,
+        "file_modified": 1,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 1,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0012",
+      "scenario_id": "N2",
+      "label": 0,
+      "variation": {
+        "file_count": 3,
+        "delay_s": 1.8
+      },
+      "start_time": "2026-08-20T18:19:35.481932+00:00",
+      "end_time": "2026-08-20T18:19:35.784395+00:00",
+      "event_count": 3,
+      "features": {
+        "total_events": 3,
+        "file_created": 0,
+        "file_modified": 3,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 3,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0013",
+      "scenario_id": "N3",
+      "label": 0,
+      "variation": {
+        "file_count": 4,
+        "delay_s": 1.2
+      },
+      "start_time": "2026-08-20T18:19:35.784716+00:00",
+      "end_time": "2026-08-20T18:19:36.186900+00:00",
+      "event_count": 4,
+      "features": {
+        "total_events": 4,
+        "file_created": 0,
+        "file_modified": 4,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 4,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0014",
+      "scenario_id": "N3",
+      "label": 0,
+      "variation": {
+        "file_count": 5,
+        "delay_s": 1.0
+      },
+      "start_time": "2026-08-20T18:19:36.187205+00:00",
+      "end_time": "2026-08-20T18:19:36.690380+00:00",
+      "event_count": 5,
+      "features": {
+        "total_events": 5,
+        "file_created": 0,
+        "file_modified": 5,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 5,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0015",
+      "scenario_id": "N3",
+      "label": 0,
+      "variation": {
+        "file_count": 6,
+        "delay_s": 0.8
+      },
+      "start_time": "2026-08-20T18:19:36.690795+00:00",
+      "end_time": "2026-08-20T18:19:37.294732+00:00",
+      "event_count": 6,
+      "features": {
+        "total_events": 6,
+        "file_created": 0,
+        "file_modified": 6,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 6,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0016",
+      "scenario_id": "N3",
+      "label": 0,
+      "variation": {
+        "file_count": 7,
+        "delay_s": 0.6
+      },
+      "start_time": "2026-08-20T18:19:37.295134+00:00",
+      "end_time": "2026-08-20T18:19:37.999171+00:00",
+      "event_count": 7,
+      "features": {
+        "total_events": 7,
+        "file_created": 0,
+        "file_modified": 7,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 7,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0017",
+      "scenario_id": "N3",
+      "label": 0,
+      "variation": {
+        "file_count": 5,
+        "delay_s": 0.9
+      },
+      "start_time": "2026-08-20T18:19:37.999508+00:00",
+      "end_time": "2026-08-20T18:19:38.502974+00:00",
+      "event_count": 5,
+      "features": {
+        "total_events": 5,
+        "file_created": 0,
+        "file_modified": 5,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 5,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0018",
+      "scenario_id": "N3",
+      "label": 0,
+      "variation": {
+        "file_count": 4,
+        "delay_s": 1.5
+      },
+      "start_time": "2026-08-20T18:19:38.503284+00:00",
+      "end_time": "2026-08-20T18:19:38.905638+00:00",
+      "event_count": 4,
+      "features": {
+        "total_events": 4,
+        "file_created": 0,
+        "file_modified": 4,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 4,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0019",
+      "scenario_id": "N4",
+      "label": 0,
+      "variation": {
+        "create_count": 3,
+        "rename_count": 1,
+        "delete_count": 0
+      },
+      "start_time": "2026-08-20T18:19:38.906045+00:00",
+      "end_time": "2026-08-20T18:19:39.308327+00:00",
+      "event_count": 4,
+      "features": {
+        "total_events": 4,
+        "file_created": 3,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 1,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0020",
+      "scenario_id": "N4",
+      "label": 0,
+      "variation": {
+        "create_count": 4,
+        "rename_count": 2,
+        "delete_count": 1
+      },
+      "start_time": "2026-08-20T18:19:39.308659+00:00",
+      "end_time": "2026-08-20T18:19:40.012619+00:00",
+      "event_count": 7,
+      "features": {
+        "total_events": 7,
+        "file_created": 4,
+        "file_modified": 0,
+        "file_deleted": 1,
+        "file_renamed": 2,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0021",
+      "scenario_id": "N4",
+      "label": 0,
+      "variation": {
+        "create_count": 5,
+        "rename_count": 3,
+        "delete_count": 1
+      },
+      "start_time": "2026-08-20T18:19:40.012946+00:00",
+      "end_time": "2026-08-20T18:19:40.921034+00:00",
+      "event_count": 9,
+      "features": {
+        "total_events": 9,
+        "file_created": 5,
+        "file_modified": 0,
+        "file_deleted": 1,
+        "file_renamed": 3,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0022",
+      "scenario_id": "N4",
+      "label": 0,
+      "variation": {
+        "create_count": 6,
+        "rename_count": 2,
+        "delete_count": 2
+      },
+      "start_time": "2026-08-20T18:19:40.921642+00:00",
+      "end_time": "2026-08-20T18:19:41.928523+00:00",
+      "event_count": 10,
+      "features": {
+        "total_events": 10,
+        "file_created": 6,
+        "file_modified": 0,
+        "file_deleted": 2,
+        "file_renamed": 2,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0023",
+      "scenario_id": "N4",
+      "label": 0,
+      "variation": {
+        "create_count": 3,
+        "rename_count": 2,
+        "delete_count": 0
+      },
+      "start_time": "2026-08-20T18:19:41.929289+00:00",
+      "end_time": "2026-08-20T18:19:42.431661+00:00",
+      "event_count": 5,
+      "features": {
+        "total_events": 5,
+        "file_created": 3,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 2,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0024",
+      "scenario_id": "N4",
+      "label": 0,
+      "variation": {
+        "create_count": 5,
+        "rename_count": 1,
+        "delete_count": 1
+      },
+      "start_time": "2026-08-20T18:19:42.432021+00:00",
+      "end_time": "2026-08-20T18:19:43.147741+00:00",
+      "event_count": 7,
+      "features": {
+        "total_events": 7,
+        "file_created": 5,
+        "file_modified": 0,
+        "file_deleted": 1,
+        "file_renamed": 1,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0025",
+      "scenario_id": "N5",
+      "label": 0,
+      "variation": {
+        "file_count": 8,
+        "delay_s": 0.12
+      },
+      "start_time": "2026-08-20T18:19:43.148085+00:00",
+      "end_time": "2026-08-20T18:19:43.952870+00:00",
+      "event_count": 8,
+      "features": {
+        "total_events": 8,
+        "file_created": 8,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0026",
+      "scenario_id": "N5",
+      "label": 0,
+      "variation": {
+        "file_count": 10,
+        "delay_s": 0.08
+      },
+      "start_time": "2026-08-20T18:19:43.953389+00:00",
+      "end_time": "2026-08-20T18:19:44.959437+00:00",
+      "event_count": 10,
+      "features": {
+        "total_events": 10,
+        "file_created": 10,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0027",
+      "scenario_id": "N5",
+      "label": 0,
+      "variation": {
+        "file_count": 12,
+        "delay_s": 0.06
+      },
+      "start_time": "2026-08-20T18:19:44.960102+00:00",
+      "end_time": "2026-08-20T18:19:46.171029+00:00",
+      "event_count": 12,
+      "features": {
+        "total_events": 12,
+        "file_created": 12,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0028",
+      "scenario_id": "N5",
+      "label": 0,
+      "variation": {
+        "file_count": 15,
+        "delay_s": 0.04
+      },
+      "start_time": "2026-08-20T18:19:46.171489+00:00",
+      "end_time": "2026-08-20T18:19:47.681179+00:00",
+      "event_count": 15,
+      "features": {
+        "total_events": 15,
+        "file_created": 15,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0029",
+      "scenario_id": "N5",
+      "label": 0,
+      "variation": {
+        "file_count": 9,
+        "delay_s": 0.1
+      },
+      "start_time": "2026-08-20T18:19:47.682223+00:00",
+      "end_time": "2026-08-20T18:19:48.589199+00:00",
+      "event_count": 9,
+      "features": {
+        "total_events": 9,
+        "file_created": 9,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0030",
+      "scenario_id": "N5",
+      "label": 0,
+      "variation": {
+        "file_count": 11,
+        "delay_s": 0.07
+      },
+      "start_time": "2026-08-20T18:19:48.589581+00:00",
+      "end_time": "2026-08-20T18:19:49.697517+00:00",
+      "event_count": 11,
+      "features": {
+        "total_events": 11,
+        "file_created": 11,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0031",
+      "scenario_id": "N6",
+      "label": 0,
+      "variation": {
+        "connections": 3,
+        "ips": 2
+      },
+      "start_time": "2026-08-20T18:19:49.698667+00:00",
+      "end_time": "2026-08-20T18:19:50.000465+00:00",
+      "event_count": 3,
+      "features": {
+        "total_events": 3,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 3,
+        "established_connections": 3,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0032",
+      "scenario_id": "N6",
+      "label": 0,
+      "variation": {
+        "connections": 5,
+        "ips": 3
+      },
+      "start_time": "2026-08-20T18:19:50.000746+00:00",
+      "end_time": "2026-08-20T18:19:50.502913+00:00",
+      "event_count": 5,
+      "features": {
+        "total_events": 5,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 5,
+        "established_connections": 5,
+        "unique_remote_ips": 3
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0033",
+      "scenario_id": "N6",
+      "label": 0,
+      "variation": {
+        "connections": 7,
+        "ips": 4
+      },
+      "start_time": "2026-08-20T18:19:50.503044+00:00",
+      "end_time": "2026-08-20T18:19:51.205430+00:00",
+      "event_count": 7,
+      "features": {
+        "total_events": 7,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 7,
+        "established_connections": 7,
+        "unique_remote_ips": 4
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0034",
+      "scenario_id": "N6",
+      "label": 0,
+      "variation": {
+        "connections": 4,
+        "ips": 2
+      },
+      "start_time": "2026-08-20T18:19:51.205526+00:00",
+      "end_time": "2026-08-20T18:19:51.607050+00:00",
+      "event_count": 4,
+      "features": {
+        "total_events": 4,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 4,
+        "established_connections": 4,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0035",
+      "scenario_id": "N6",
+      "label": 0,
+      "variation": {
+        "connections": 6,
+        "ips": 3
+      },
+      "start_time": "2026-08-20T18:19:51.607144+00:00",
+      "end_time": "2026-08-20T18:19:52.209556+00:00",
+      "event_count": 6,
+      "features": {
+        "total_events": 6,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 6,
+        "established_connections": 6,
+        "unique_remote_ips": 3
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0036",
+      "scenario_id": "N6",
+      "label": 0,
+      "variation": {
+        "connections": 8,
+        "ips": 5
+      },
+      "start_time": "2026-08-20T18:19:52.209674+00:00",
+      "end_time": "2026-08-20T18:19:53.012818+00:00",
+      "event_count": 8,
+      "features": {
+        "total_events": 8,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 8,
+        "established_connections": 8,
+        "unique_remote_ips": 5
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0037",
+      "scenario_id": "N7",
+      "label": 0,
+      "variation": {
+        "downloads": 2,
+        "ips": 1
+      },
+      "start_time": "2026-08-20T18:19:53.013040+00:00",
+      "end_time": "2026-08-20T18:19:53.214792+00:00",
+      "event_count": 4,
+      "features": {
+        "total_events": 4,
+        "file_created": 2,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 2,
+        "established_connections": 2,
+        "unique_remote_ips": 1
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0038",
+      "scenario_id": "N7",
+      "label": 0,
+      "variation": {
+        "downloads": 3,
+        "ips": 2
+      },
+      "start_time": "2026-08-20T18:19:53.215061+00:00",
+      "end_time": "2026-08-20T18:19:53.518281+00:00",
+      "event_count": 6,
+      "features": {
+        "total_events": 6,
+        "file_created": 3,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 3,
+        "established_connections": 3,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0039",
+      "scenario_id": "N7",
+      "label": 0,
+      "variation": {
+        "downloads": 4,
+        "ips": 2
+      },
+      "start_time": "2026-08-20T18:19:53.518698+00:00",
+      "end_time": "2026-08-20T18:19:53.923272+00:00",
+      "event_count": 8,
+      "features": {
+        "total_events": 8,
+        "file_created": 4,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 4,
+        "established_connections": 4,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0040",
+      "scenario_id": "N7",
+      "label": 0,
+      "variation": {
+        "downloads": 5,
+        "ips": 3
+      },
+      "start_time": "2026-08-20T18:19:53.923564+00:00",
+      "end_time": "2026-08-20T18:19:54.428314+00:00",
+      "event_count": 10,
+      "features": {
+        "total_events": 10,
+        "file_created": 5,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 5,
+        "established_connections": 5,
+        "unique_remote_ips": 3
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0041",
+      "scenario_id": "N7",
+      "label": 0,
+      "variation": {
+        "downloads": 3,
+        "ips": 1
+      },
+      "start_time": "2026-08-20T18:19:54.428619+00:00",
+      "end_time": "2026-08-20T18:19:54.732215+00:00",
+      "event_count": 6,
+      "features": {
+        "total_events": 6,
+        "file_created": 3,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 3,
+        "established_connections": 3,
+        "unique_remote_ips": 1
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0042",
+      "scenario_id": "N7",
+      "label": 0,
+      "variation": {
+        "downloads": 4,
+        "ips": 2
+      },
+      "start_time": "2026-08-20T18:19:54.732858+00:00",
+      "end_time": "2026-08-20T18:19:55.137159+00:00",
+      "event_count": 8,
+      "features": {
+        "total_events": 8,
+        "file_created": 4,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 4,
+        "established_connections": 4,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0043",
+      "scenario_id": "N8",
+      "label": 0,
+      "variation": {
+        "writes": 10,
+        "unique_files": 1
+      },
+      "start_time": "2026-08-20T18:19:55.137472+00:00",
+      "end_time": "2026-08-20T18:19:56.143385+00:00",
+      "event_count": 10,
+      "features": {
+        "total_events": 10,
+        "file_created": 0,
+        "file_modified": 10,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 1,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0044",
+      "scenario_id": "N8",
+      "label": 0,
+      "variation": {
+        "writes": 15,
+        "unique_files": 1
+      },
+      "start_time": "2026-08-20T18:19:56.143604+00:00",
+      "end_time": "2026-08-20T18:19:57.652050+00:00",
+      "event_count": 15,
+      "features": {
+        "total_events": 15,
+        "file_created": 0,
+        "file_modified": 15,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 1,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0045",
+      "scenario_id": "N8",
+      "label": 0,
+      "variation": {
+        "writes": 20,
+        "unique_files": 2
+      },
+      "start_time": "2026-08-20T18:19:57.652401+00:00",
+      "end_time": "2026-08-20T18:19:59.664355+00:00",
+      "event_count": 20,
+      "features": {
+        "total_events": 20,
+        "file_created": 0,
+        "file_modified": 20,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 2,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0046",
+      "scenario_id": "N8",
+      "label": 0,
+      "variation": {
+        "writes": 25,
+        "unique_files": 1
+      },
+      "start_time": "2026-08-20T18:19:59.664822+00:00",
+      "end_time": "2026-08-20T18:20:02.179424+00:00",
+      "event_count": 25,
+      "features": {
+        "total_events": 25,
+        "file_created": 0,
+        "file_modified": 25,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 1,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0047",
+      "scenario_id": "N8",
+      "label": 0,
+      "variation": {
+        "writes": 12,
+        "unique_files": 2
+      },
+      "start_time": "2026-08-20T18:20:02.179672+00:00",
+      "end_time": "2026-08-20T18:20:03.387510+00:00",
+      "event_count": 12,
+      "features": {
+        "total_events": 12,
+        "file_created": 0,
+        "file_modified": 12,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 2,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0048",
+      "scenario_id": "N8",
+      "label": 0,
+      "variation": {
+        "writes": 18,
+        "unique_files": 1
+      },
+      "start_time": "2026-08-20T18:20:03.387886+00:00",
+      "end_time": "2026-08-20T18:20:05.200861+00:00",
+      "event_count": 18,
+      "features": {
+        "total_events": 18,
+        "file_created": 0,
+        "file_modified": 18,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 1,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0049",
+      "scenario_id": "N9",
+      "label": 0,
+      "variation": {
+        "file_mod": 3,
+        "file_create": 1,
+        "processes": 2,
+        "network": 1
+      },
+      "start_time": "2026-08-20T18:20:05.201148+00:00",
+      "end_time": "2026-08-20T18:20:05.703850+00:00",
+      "event_count": 5,
+      "features": {
+        "total_events": 5,
+        "file_created": 1,
+        "file_modified": 3,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 3,
+        "process_events": 0,
+        "network_events": 1,
+        "established_connections": 1,
+        "unique_remote_ips": 1
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0050",
+      "scenario_id": "N9",
+      "label": 0,
+      "variation": {
+        "file_mod": 4,
+        "file_create": 2,
+        "processes": 3,
+        "network": 2
+      },
+      "start_time": "2026-08-20T18:20:05.704385+00:00",
+      "end_time": "2026-08-20T18:20:06.508919+00:00",
+      "event_count": 8,
+      "features": {
+        "total_events": 8,
+        "file_created": 2,
+        "file_modified": 4,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 4,
+        "process_events": 0,
+        "network_events": 2,
+        "established_connections": 2,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0051",
+      "scenario_id": "N9",
+      "label": 0,
+      "variation": {
+        "file_mod": 5,
+        "file_create": 3,
+        "processes": 2,
+        "network": 3
+      },
+      "start_time": "2026-08-20T18:20:06.509584+00:00",
+      "end_time": "2026-08-20T18:20:07.615948+00:00",
+      "event_count": 11,
+      "features": {
+        "total_events": 11,
+        "file_created": 3,
+        "file_modified": 5,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 5,
+        "process_events": 0,
+        "network_events": 3,
+        "established_connections": 3,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0052",
+      "scenario_id": "N9",
+      "label": 0,
+      "variation": {
+        "file_mod": 6,
+        "file_create": 2,
+        "processes": 4,
+        "network": 2
+      },
+      "start_time": "2026-08-20T18:20:07.616566+00:00",
+      "end_time": "2026-08-20T18:20:08.622985+00:00",
+      "event_count": 10,
+      "features": {
+        "total_events": 10,
+        "file_created": 2,
+        "file_modified": 6,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 6,
+        "process_events": 0,
+        "network_events": 2,
+        "established_connections": 2,
+        "unique_remote_ips": 1
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0053",
+      "scenario_id": "N9",
+      "label": 0,
+      "variation": {
+        "file_mod": 4,
+        "file_create": 1,
+        "processes": 3,
+        "network": 1
+      },
+      "start_time": "2026-08-20T18:20:08.623823+00:00",
+      "end_time": "2026-08-20T18:20:09.227360+00:00",
+      "event_count": 6,
+      "features": {
+        "total_events": 6,
+        "file_created": 1,
+        "file_modified": 4,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 4,
+        "process_events": 0,
+        "network_events": 1,
+        "established_connections": 1,
+        "unique_remote_ips": 1
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0054",
+      "scenario_id": "N9",
+      "label": 0,
+      "variation": {
+        "file_mod": 5,
+        "file_create": 2,
+        "processes": 2,
+        "network": 2
+      },
+      "start_time": "2026-08-20T18:20:09.227643+00:00",
+      "end_time": "2026-08-20T18:20:10.133233+00:00",
+      "event_count": 9,
+      "features": {
+        "total_events": 9,
+        "file_created": 2,
+        "file_modified": 5,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 5,
+        "process_events": 0,
+        "network_events": 2,
+        "established_connections": 2,
+        "unique_remote_ips": 1
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0055",
+      "scenario_id": "N10",
+      "label": 0,
+      "variation": {
+        "file_count": 8,
+        "delay_s": 0.08
+      },
+      "start_time": "2026-08-20T18:20:10.133770+00:00",
+      "end_time": "2026-08-20T18:20:10.939433+00:00",
+      "event_count": 8,
+      "features": {
+        "total_events": 8,
+        "file_created": 8,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0056",
+      "scenario_id": "N10",
+      "label": 0,
+      "variation": {
+        "file_count": 12,
+        "delay_s": 0.05
+      },
+      "start_time": "2026-08-20T18:20:10.939897+00:00",
+      "end_time": "2026-08-20T18:20:12.151456+00:00",
+      "event_count": 12,
+      "features": {
+        "total_events": 12,
+        "file_created": 12,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0057",
+      "scenario_id": "N10",
+      "label": 0,
+      "variation": {
+        "file_count": 15,
+        "delay_s": 0.04
+      },
+      "start_time": "2026-08-20T18:20:12.152028+00:00",
+      "end_time": "2026-08-20T18:20:13.661451+00:00",
+      "event_count": 15,
+      "features": {
+        "total_events": 15,
+        "file_created": 15,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0058",
+      "scenario_id": "N10",
+      "label": 0,
+      "variation": {
+        "file_count": 18,
+        "delay_s": 0.03
+      },
+      "start_time": "2026-08-20T18:20:13.662671+00:00",
+      "end_time": "2026-08-20T18:20:15.475116+00:00",
+      "event_count": 18,
+      "features": {
+        "total_events": 18,
+        "file_created": 18,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0059",
+      "scenario_id": "N10",
+      "label": 0,
+      "variation": {
+        "file_count": 10,
+        "delay_s": 0.06
+      },
+      "start_time": "2026-08-20T18:20:15.476529+00:00",
+      "end_time": "2026-08-20T18:20:16.484141+00:00",
+      "event_count": 10,
+      "features": {
+        "total_events": 10,
+        "file_created": 10,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0060",
+      "scenario_id": "N10",
+      "label": 0,
+      "variation": {
+        "file_count": 14,
+        "delay_s": 0.04
+      },
+      "start_time": "2026-08-20T18:20:16.484733+00:00",
+      "end_time": "2026-08-20T18:20:17.893711+00:00",
+      "event_count": 14,
+      "features": {
+        "total_events": 14,
+        "file_created": 14,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0061",
+      "scenario_id": "R1",
+      "label": 1,
+      "variation": {
+        "file_count": 8,
+        "delay_s": 0.3
+      },
+      "start_time": "2026-08-20T18:20:17.894300+00:00",
+      "end_time": "2026-08-20T18:20:18.704876+00:00",
+      "event_count": 8,
+      "features": {
+        "total_events": 8,
+        "file_created": 0,
+        "file_modified": 8,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 8,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0062",
+      "scenario_id": "R1",
+      "label": 1,
+      "variation": {
+        "file_count": 10,
+        "delay_s": 0.2
+      },
+      "start_time": "2026-08-20T18:20:18.705669+00:00",
+      "end_time": "2026-08-20T18:20:19.714044+00:00",
+      "event_count": 10,
+      "features": {
+        "total_events": 10,
+        "file_created": 0,
+        "file_modified": 10,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 10,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0063",
+      "scenario_id": "R1",
+      "label": 1,
+      "variation": {
+        "file_count": 12,
+        "delay_s": 0.1
+      },
+      "start_time": "2026-08-20T18:20:19.715125+00:00",
+      "end_time": "2026-08-20T18:20:20.926363+00:00",
+      "event_count": 12,
+      "features": {
+        "total_events": 12,
+        "file_created": 0,
+        "file_modified": 12,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 12,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0064",
+      "scenario_id": "R1",
+      "label": 1,
+      "variation": {
+        "file_count": 9,
+        "delay_s": 0.25
+      },
+      "start_time": "2026-08-20T18:20:20.926882+00:00",
+      "end_time": "2026-08-20T18:20:21.835192+00:00",
+      "event_count": 9,
+      "features": {
+        "total_events": 9,
+        "file_created": 0,
+        "file_modified": 9,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 9,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0065",
+      "scenario_id": "R1",
+      "label": 1,
+      "variation": {
+        "file_count": 11,
+        "delay_s": 0.15
+      },
+      "start_time": "2026-08-20T18:20:21.835564+00:00",
+      "end_time": "2026-08-20T18:20:22.943588+00:00",
+      "event_count": 11,
+      "features": {
+        "total_events": 11,
+        "file_created": 0,
+        "file_modified": 11,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 11,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0066",
+      "scenario_id": "R1",
+      "label": 1,
+      "variation": {
+        "file_count": 8,
+        "delay_s": 0.35
+      },
+      "start_time": "2026-08-20T18:20:22.944008+00:00",
+      "end_time": "2026-08-20T18:20:23.750751+00:00",
+      "event_count": 8,
+      "features": {
+        "total_events": 8,
+        "file_created": 0,
+        "file_modified": 8,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 8,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0067",
+      "scenario_id": "R2",
+      "label": 1,
+      "variation": {
+        "file_count": 20,
+        "delay_s": 0.05
+      },
+      "start_time": "2026-08-20T18:20:23.751349+00:00",
+      "end_time": "2026-08-20T18:20:25.768343+00:00",
+      "event_count": 20,
+      "features": {
+        "total_events": 20,
+        "file_created": 0,
+        "file_modified": 20,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 20,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0068",
+      "scenario_id": "R2",
+      "label": 1,
+      "variation": {
+        "file_count": 25,
+        "delay_s": 0.04
+      },
+      "start_time": "2026-08-20T18:20:25.768999+00:00",
+      "end_time": "2026-08-20T18:20:28.293773+00:00",
+      "event_count": 25,
+      "features": {
+        "total_events": 25,
+        "file_created": 0,
+        "file_modified": 25,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 25,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0069",
+      "scenario_id": "R2",
+      "label": 1,
+      "variation": {
+        "file_count": 30,
+        "delay_s": 0.02
+      },
+      "start_time": "2026-08-20T18:20:28.295571+00:00",
+      "end_time": "2026-08-20T18:20:31.325763+00:00",
+      "event_count": 30,
+      "features": {
+        "total_events": 30,
+        "file_created": 0,
+        "file_modified": 30,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 30,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0070",
+      "scenario_id": "R2",
+      "label": 1,
+      "variation": {
+        "file_count": 22,
+        "delay_s": 0.06
+      },
+      "start_time": "2026-08-20T18:20:31.327502+00:00",
+      "end_time": "2026-08-20T18:20:33.545658+00:00",
+      "event_count": 22,
+      "features": {
+        "total_events": 22,
+        "file_created": 0,
+        "file_modified": 22,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 22,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0071",
+      "scenario_id": "R2",
+      "label": 1,
+      "variation": {
+        "file_count": 28,
+        "delay_s": 0.03
+      },
+      "start_time": "2026-08-20T18:20:33.546463+00:00",
+      "end_time": "2026-08-20T18:20:36.372969+00:00",
+      "event_count": 28,
+      "features": {
+        "total_events": 28,
+        "file_created": 0,
+        "file_modified": 28,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 28,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0072",
+      "scenario_id": "R2",
+      "label": 1,
+      "variation": {
+        "file_count": 18,
+        "delay_s": 0.07
+      },
+      "start_time": "2026-08-20T18:20:36.373778+00:00",
+      "end_time": "2026-08-20T18:20:38.192774+00:00",
+      "event_count": 18,
+      "features": {
+        "total_events": 18,
+        "file_created": 0,
+        "file_modified": 18,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 18,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0073",
+      "scenario_id": "R3",
+      "label": 1,
+      "variation": {
+        "file_count": 8,
+        "delay_s": 0.12,
+        "extension": ".encrypted"
+      },
+      "start_time": "2026-08-20T18:20:38.193331+00:00",
+      "end_time": "2026-08-20T18:20:39.004476+00:00",
+      "event_count": 16,
+      "features": {
+        "total_events": 16,
+        "file_created": 0,
+        "file_modified": 8,
+        "file_deleted": 0,
+        "file_renamed": 8,
+        "unique_files_modified": 8,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0074",
+      "scenario_id": "R3",
+      "label": 1,
+      "variation": {
+        "file_count": 10,
+        "delay_s": 0.1,
+        "extension": ".locked"
+      },
+      "start_time": "2026-08-20T18:20:39.004906+00:00",
+      "end_time": "2026-08-20T18:20:40.018059+00:00",
+      "event_count": 20,
+      "features": {
+        "total_events": 20,
+        "file_created": 0,
+        "file_modified": 10,
+        "file_deleted": 0,
+        "file_renamed": 10,
+        "unique_files_modified": 10,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0075",
+      "scenario_id": "R3",
+      "label": 1,
+      "variation": {
+        "file_count": 12,
+        "delay_s": 0.08,
+        "extension": ".cry"
+      },
+      "start_time": "2026-08-20T18:20:40.018761+00:00",
+      "end_time": "2026-08-20T18:20:41.235393+00:00",
+      "event_count": 24,
+      "features": {
+        "total_events": 24,
+        "file_created": 0,
+        "file_modified": 12,
+        "file_deleted": 0,
+        "file_renamed": 12,
+        "unique_files_modified": 12,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0076",
+      "scenario_id": "R3",
+      "label": 1,
+      "variation": {
+        "file_count": 15,
+        "delay_s": 0.06,
+        "extension": ".enc"
+      },
+      "start_time": "2026-08-20T18:20:41.236073+00:00",
+      "end_time": "2026-08-20T18:20:42.762400+00:00",
+      "event_count": 30,
+      "features": {
+        "total_events": 30,
+        "file_created": 0,
+        "file_modified": 15,
+        "file_deleted": 0,
+        "file_renamed": 15,
+        "unique_files_modified": 15,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0077",
+      "scenario_id": "R3",
+      "label": 1,
+      "variation": {
+        "file_count": 9,
+        "delay_s": 0.11,
+        "extension": ".WNCRY"
+      },
+      "start_time": "2026-08-20T18:20:42.763443+00:00",
+      "end_time": "2026-08-20T18:20:43.676386+00:00",
+      "event_count": 18,
+      "features": {
+        "total_events": 18,
+        "file_created": 0,
+        "file_modified": 9,
+        "file_deleted": 0,
+        "file_renamed": 9,
+        "unique_files_modified": 9,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0078",
+      "scenario_id": "R3",
+      "label": 1,
+      "variation": {
+        "file_count": 11,
+        "delay_s": 0.09,
+        "extension": ".locked"
+      },
+      "start_time": "2026-08-20T18:20:43.677168+00:00",
+      "end_time": "2026-08-20T18:20:44.794213+00:00",
+      "event_count": 22,
+      "features": {
+        "total_events": 22,
+        "file_created": 0,
+        "file_modified": 11,
+        "file_deleted": 0,
+        "file_renamed": 11,
+        "unique_files_modified": 11,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0079",
+      "scenario_id": "R4",
+      "label": 1,
+      "variation": {
+        "file_count": 8,
+        "delay_s": 0.12
+      },
+      "start_time": "2026-08-20T18:20:44.794708+00:00",
+      "end_time": "2026-08-20T18:20:45.604966+00:00",
+      "event_count": 16,
+      "features": {
+        "total_events": 16,
+        "file_created": 8,
+        "file_modified": 0,
+        "file_deleted": 8,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0080",
+      "scenario_id": "R4",
+      "label": 1,
+      "variation": {
+        "file_count": 10,
+        "delay_s": 0.1
+      },
+      "start_time": "2026-08-20T18:20:45.605345+00:00",
+      "end_time": "2026-08-20T18:20:46.618184+00:00",
+      "event_count": 20,
+      "features": {
+        "total_events": 20,
+        "file_created": 10,
+        "file_modified": 0,
+        "file_deleted": 10,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0081",
+      "scenario_id": "R4",
+      "label": 1,
+      "variation": {
+        "file_count": 12,
+        "delay_s": 0.08
+      },
+      "start_time": "2026-08-20T18:20:46.618923+00:00",
+      "end_time": "2026-08-20T18:20:47.835510+00:00",
+      "event_count": 24,
+      "features": {
+        "total_events": 24,
+        "file_created": 12,
+        "file_modified": 0,
+        "file_deleted": 12,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0082",
+      "scenario_id": "R4",
+      "label": 1,
+      "variation": {
+        "file_count": 15,
+        "delay_s": 0.06
+      },
+      "start_time": "2026-08-20T18:20:47.836322+00:00",
+      "end_time": "2026-08-20T18:20:49.356665+00:00",
+      "event_count": 30,
+      "features": {
+        "total_events": 30,
+        "file_created": 15,
+        "file_modified": 0,
+        "file_deleted": 15,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0083",
+      "scenario_id": "R4",
+      "label": 1,
+      "variation": {
+        "file_count": 9,
+        "delay_s": 0.11
+      },
+      "start_time": "2026-08-20T18:20:49.357229+00:00",
+      "end_time": "2026-08-20T18:20:50.270108+00:00",
+      "event_count": 18,
+      "features": {
+        "total_events": 18,
+        "file_created": 9,
+        "file_modified": 0,
+        "file_deleted": 9,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0084",
+      "scenario_id": "R4",
+      "label": 1,
+      "variation": {
+        "file_count": 11,
+        "delay_s": 0.09
+      },
+      "start_time": "2026-08-20T18:20:50.270520+00:00",
+      "end_time": "2026-08-20T18:20:51.382762+00:00",
+      "event_count": 22,
+      "features": {
+        "total_events": 22,
+        "file_created": 11,
+        "file_modified": 0,
+        "file_deleted": 11,
+        "file_renamed": 0,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0085",
+      "scenario_id": "R5",
+      "label": 1,
+      "variation": {
+        "total_ops": 12,
+        "delay_s": 0.08
+      },
+      "start_time": "2026-08-20T18:20:51.383445+00:00",
+      "end_time": "2026-08-20T18:20:52.591909+00:00",
+      "event_count": 12,
+      "features": {
+        "total_events": 12,
+        "file_created": 5,
+        "file_modified": 1,
+        "file_deleted": 4,
+        "file_renamed": 2,
+        "unique_files_modified": 1,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0086",
+      "scenario_id": "R5",
+      "label": 1,
+      "variation": {
+        "total_ops": 15,
+        "delay_s": 0.06
+      },
+      "start_time": "2026-08-20T18:20:52.592425+00:00",
+      "end_time": "2026-08-20T18:20:54.107483+00:00",
+      "event_count": 15,
+      "features": {
+        "total_events": 15,
+        "file_created": 3,
+        "file_modified": 6,
+        "file_deleted": 3,
+        "file_renamed": 3,
+        "unique_files_modified": 6,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0087",
+      "scenario_id": "R5",
+      "label": 1,
+      "variation": {
+        "total_ops": 18,
+        "delay_s": 0.04
+      },
+      "start_time": "2026-08-20T18:20:54.108165+00:00",
+      "end_time": "2026-08-20T18:20:55.921169+00:00",
+      "event_count": 18,
+      "features": {
+        "total_events": 18,
+        "file_created": 1,
+        "file_modified": 7,
+        "file_deleted": 7,
+        "file_renamed": 3,
+        "unique_files_modified": 7,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0088",
+      "scenario_id": "R5",
+      "label": 1,
+      "variation": {
+        "total_ops": 22,
+        "delay_s": 0.03
+      },
+      "start_time": "2026-08-20T18:20:55.921918+00:00",
+      "end_time": "2026-08-20T18:20:58.139978+00:00",
+      "event_count": 22,
+      "features": {
+        "total_events": 22,
+        "file_created": 5,
+        "file_modified": 11,
+        "file_deleted": 1,
+        "file_renamed": 5,
+        "unique_files_modified": 11,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0089",
+      "scenario_id": "R5",
+      "label": 1,
+      "variation": {
+        "total_ops": 14,
+        "delay_s": 0.07
+      },
+      "start_time": "2026-08-20T18:20:58.141171+00:00",
+      "end_time": "2026-08-20T18:20:59.552087+00:00",
+      "event_count": 14,
+      "features": {
+        "total_events": 14,
+        "file_created": 5,
+        "file_modified": 6,
+        "file_deleted": 1,
+        "file_renamed": 2,
+        "unique_files_modified": 6,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0090",
+      "scenario_id": "R5",
+      "label": 1,
+      "variation": {
+        "total_ops": 20,
+        "delay_s": 0.05
+      },
+      "start_time": "2026-08-20T18:20:59.553069+00:00",
+      "end_time": "2026-08-20T18:21:01.567545+00:00",
+      "event_count": 20,
+      "features": {
+        "total_events": 20,
+        "file_created": 3,
+        "file_modified": 4,
+        "file_deleted": 6,
+        "file_renamed": 7,
+        "unique_files_modified": 4,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0091",
+      "scenario_id": "R6",
+      "label": 1,
+      "variation": {
+        "file_count": 5,
+        "delay_s": 1.8
+      },
+      "start_time": "2026-08-20T18:21:01.568527+00:00",
+      "end_time": "2026-08-20T18:21:02.072673+00:00",
+      "event_count": 5,
+      "features": {
+        "total_events": 5,
+        "file_created": 0,
+        "file_modified": 5,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 5,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0092",
+      "scenario_id": "R6",
+      "label": 1,
+      "variation": {
+        "file_count": 6,
+        "delay_s": 1.5
+      },
+      "start_time": "2026-08-20T18:21:02.073022+00:00",
+      "end_time": "2026-08-20T18:21:02.678292+00:00",
+      "event_count": 6,
+      "features": {
+        "total_events": 6,
+        "file_created": 0,
+        "file_modified": 6,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 6,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0093",
+      "scenario_id": "R6",
+      "label": 1,
+      "variation": {
+        "file_count": 7,
+        "delay_s": 1.2
+      },
+      "start_time": "2026-08-20T18:21:02.678627+00:00",
+      "end_time": "2026-08-20T18:21:03.384711+00:00",
+      "event_count": 7,
+      "features": {
+        "total_events": 7,
+        "file_created": 0,
+        "file_modified": 7,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 7,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0094",
+      "scenario_id": "R6",
+      "label": 1,
+      "variation": {
+        "file_count": 8,
+        "delay_s": 1.0
+      },
+      "start_time": "2026-08-20T18:21:03.385109+00:00",
+      "end_time": "2026-08-20T18:21:04.192477+00:00",
+      "event_count": 8,
+      "features": {
+        "total_events": 8,
+        "file_created": 0,
+        "file_modified": 8,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 8,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0095",
+      "scenario_id": "R6",
+      "label": 1,
+      "variation": {
+        "file_count": 5,
+        "delay_s": 1.6
+      },
+      "start_time": "2026-08-20T18:21:04.192847+00:00",
+      "end_time": "2026-08-20T18:21:04.696786+00:00",
+      "event_count": 5,
+      "features": {
+        "total_events": 5,
+        "file_created": 0,
+        "file_modified": 5,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 5,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0096",
+      "scenario_id": "R6",
+      "label": 1,
+      "variation": {
+        "file_count": 7,
+        "delay_s": 1.3
+      },
+      "start_time": "2026-08-20T18:21:04.697103+00:00",
+      "end_time": "2026-08-20T18:21:05.403411+00:00",
+      "event_count": 7,
+      "features": {
+        "total_events": 7,
+        "file_created": 0,
+        "file_modified": 7,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 7,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0097",
+      "scenario_id": "R7",
+      "label": 1,
+      "variation": {
+        "processes": 2,
+        "files_per": 4,
+        "delay_s": 0.1
+      },
+      "start_time": "2026-08-20T18:21:05.403764+00:00",
+      "end_time": "2026-08-20T18:21:06.210199+00:00",
+      "event_count": 10,
+      "features": {
+        "total_events": 10,
+        "file_created": 0,
+        "file_modified": 8,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 8,
+        "process_events": 2,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0098",
+      "scenario_id": "R7",
+      "label": 1,
+      "variation": {
+        "processes": 3,
+        "files_per": 4,
+        "delay_s": 0.08
+      },
+      "start_time": "2026-08-20T18:21:06.210736+00:00",
+      "end_time": "2026-08-20T18:21:07.420928+00:00",
+      "event_count": 15,
+      "features": {
+        "total_events": 15,
+        "file_created": 0,
+        "file_modified": 12,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 12,
+        "process_events": 3,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0099",
+      "scenario_id": "R7",
+      "label": 1,
+      "variation": {
+        "processes": 4,
+        "files_per": 3,
+        "delay_s": 0.08
+      },
+      "start_time": "2026-08-20T18:21:07.421747+00:00",
+      "end_time": "2026-08-20T18:21:08.636187+00:00",
+      "event_count": 16,
+      "features": {
+        "total_events": 16,
+        "file_created": 0,
+        "file_modified": 12,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 12,
+        "process_events": 4,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0100",
+      "scenario_id": "R7",
+      "label": 1,
+      "variation": {
+        "processes": 3,
+        "files_per": 5,
+        "delay_s": 0.06
+      },
+      "start_time": "2026-08-20T18:21:08.637007+00:00",
+      "end_time": "2026-08-20T18:21:10.149732+00:00",
+      "event_count": 18,
+      "features": {
+        "total_events": 18,
+        "file_created": 0,
+        "file_modified": 15,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 15,
+        "process_events": 3,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0101",
+      "scenario_id": "R7",
+      "label": 1,
+      "variation": {
+        "processes": 5,
+        "files_per": 3,
+        "delay_s": 0.06
+      },
+      "start_time": "2026-08-20T18:21:10.150496+00:00",
+      "end_time": "2026-08-20T18:21:11.663000+00:00",
+      "event_count": 20,
+      "features": {
+        "total_events": 20,
+        "file_created": 0,
+        "file_modified": 15,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 15,
+        "process_events": 5,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0102",
+      "scenario_id": "R7",
+      "label": 1,
+      "variation": {
+        "processes": 2,
+        "files_per": 5,
+        "delay_s": 0.1
+      },
+      "start_time": "2026-08-20T18:21:11.663578+00:00",
+      "end_time": "2026-08-20T18:21:12.671233+00:00",
+      "event_count": 12,
+      "features": {
+        "total_events": 12,
+        "file_created": 0,
+        "file_modified": 10,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 10,
+        "process_events": 2,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0103",
+      "scenario_id": "R8",
+      "label": 1,
+      "variation": {
+        "files": 10,
+        "connections": 3,
+        "ips": 2,
+        "delay_s": 0.1
+      },
+      "start_time": "2026-08-20T18:21:12.671855+00:00",
+      "end_time": "2026-08-20T18:21:13.681714+00:00",
+      "event_count": 13,
+      "features": {
+        "total_events": 13,
+        "file_created": 0,
+        "file_modified": 10,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 10,
+        "process_events": 0,
+        "network_events": 3,
+        "established_connections": 3,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0104",
+      "scenario_id": "R8",
+      "label": 1,
+      "variation": {
+        "files": 12,
+        "connections": 4,
+        "ips": 3,
+        "delay_s": 0.08
+      },
+      "start_time": "2026-08-20T18:21:13.682425+00:00",
+      "end_time": "2026-08-20T18:21:14.893297+00:00",
+      "event_count": 16,
+      "features": {
+        "total_events": 16,
+        "file_created": 0,
+        "file_modified": 12,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 12,
+        "process_events": 0,
+        "network_events": 4,
+        "established_connections": 4,
+        "unique_remote_ips": 3
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0105",
+      "scenario_id": "R8",
+      "label": 1,
+      "variation": {
+        "files": 15,
+        "connections": 5,
+        "ips": 3,
+        "delay_s": 0.06
+      },
+      "start_time": "2026-08-20T18:21:14.893740+00:00",
+      "end_time": "2026-08-20T18:21:16.407579+00:00",
+      "event_count": 20,
+      "features": {
+        "total_events": 20,
+        "file_created": 0,
+        "file_modified": 15,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 15,
+        "process_events": 0,
+        "network_events": 5,
+        "established_connections": 5,
+        "unique_remote_ips": 3
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0106",
+      "scenario_id": "R8",
+      "label": 1,
+      "variation": {
+        "files": 18,
+        "connections": 3,
+        "ips": 2,
+        "delay_s": 0.05
+      },
+      "start_time": "2026-08-20T18:21:16.408091+00:00",
+      "end_time": "2026-08-20T18:21:18.222575+00:00",
+      "event_count": 21,
+      "features": {
+        "total_events": 21,
+        "file_created": 0,
+        "file_modified": 18,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 18,
+        "process_events": 0,
+        "network_events": 3,
+        "established_connections": 3,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0107",
+      "scenario_id": "R8",
+      "label": 1,
+      "variation": {
+        "files": 11,
+        "connections": 4,
+        "ips": 3,
+        "delay_s": 0.09
+      },
+      "start_time": "2026-08-20T18:21:18.223272+00:00",
+      "end_time": "2026-08-20T18:21:19.333390+00:00",
+      "event_count": 15,
+      "features": {
+        "total_events": 15,
+        "file_created": 0,
+        "file_modified": 11,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 11,
+        "process_events": 0,
+        "network_events": 4,
+        "established_connections": 4,
+        "unique_remote_ips": 3
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0108",
+      "scenario_id": "R8",
+      "label": 1,
+      "variation": {
+        "files": 14,
+        "connections": 5,
+        "ips": 4,
+        "delay_s": 0.07
+      },
+      "start_time": "2026-08-20T18:21:19.334044+00:00",
+      "end_time": "2026-08-20T18:21:20.746108+00:00",
+      "event_count": 19,
+      "features": {
+        "total_events": 19,
+        "file_created": 0,
+        "file_modified": 14,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 14,
+        "process_events": 0,
+        "network_events": 5,
+        "established_connections": 5,
+        "unique_remote_ips": 4
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0109",
+      "scenario_id": "R9",
+      "label": 1,
+      "variation": {
+        "files": 8,
+        "processes": 2,
+        "network": 2,
+        "ips": 2,
+        "delay_s": 0.1
+      },
+      "start_time": "2026-08-20T18:21:20.746661+00:00",
+      "end_time": "2026-08-20T18:21:21.954984+00:00",
+      "event_count": 12,
+      "features": {
+        "total_events": 12,
+        "file_created": 0,
+        "file_modified": 8,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 8,
+        "process_events": 2,
+        "network_events": 2,
+        "established_connections": 2,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0110",
+      "scenario_id": "R9",
+      "label": 1,
+      "variation": {
+        "files": 10,
+        "processes": 3,
+        "network": 3,
+        "ips": 2,
+        "delay_s": 0.08
+      },
+      "start_time": "2026-08-20T18:21:21.955384+00:00",
+      "end_time": "2026-08-20T18:21:23.566873+00:00",
+      "event_count": 16,
+      "features": {
+        "total_events": 16,
+        "file_created": 0,
+        "file_modified": 10,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 10,
+        "process_events": 3,
+        "network_events": 3,
+        "established_connections": 3,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0111",
+      "scenario_id": "R9",
+      "label": 1,
+      "variation": {
+        "files": 12,
+        "processes": 4,
+        "network": 3,
+        "ips": 3,
+        "delay_s": 0.06
+      },
+      "start_time": "2026-08-20T18:21:23.567668+00:00",
+      "end_time": "2026-08-20T18:21:25.481107+00:00",
+      "event_count": 19,
+      "features": {
+        "total_events": 19,
+        "file_created": 0,
+        "file_modified": 12,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 12,
+        "process_events": 4,
+        "network_events": 3,
+        "established_connections": 3,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0112",
+      "scenario_id": "R9",
+      "label": 1,
+      "variation": {
+        "files": 15,
+        "processes": 3,
+        "network": 4,
+        "ips": 3,
+        "delay_s": 0.05
+      },
+      "start_time": "2026-08-20T18:21:25.481905+00:00",
+      "end_time": "2026-08-20T18:21:27.697999+00:00",
+      "event_count": 22,
+      "features": {
+        "total_events": 22,
+        "file_created": 0,
+        "file_modified": 15,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 15,
+        "process_events": 3,
+        "network_events": 4,
+        "established_connections": 4,
+        "unique_remote_ips": 2
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0113",
+      "scenario_id": "R9",
+      "label": 1,
+      "variation": {
+        "files": 9,
+        "processes": 3,
+        "network": 2,
+        "ips": 2,
+        "delay_s": 0.09
+      },
+      "start_time": "2026-08-20T18:21:27.698771+00:00",
+      "end_time": "2026-08-20T18:21:29.109343+00:00",
+      "event_count": 14,
+      "features": {
+        "total_events": 14,
+        "file_created": 0,
+        "file_modified": 9,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 9,
+        "process_events": 3,
+        "network_events": 2,
+        "established_connections": 2,
+        "unique_remote_ips": 1
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0114",
+      "scenario_id": "R9",
+      "label": 1,
+      "variation": {
+        "files": 11,
+        "processes": 2,
+        "network": 3,
+        "ips": 2,
+        "delay_s": 0.07
+      },
+      "start_time": "2026-08-20T18:21:29.109903+00:00",
+      "end_time": "2026-08-20T18:21:30.726456+00:00",
+      "event_count": 16,
+      "features": {
+        "total_events": 16,
+        "file_created": 0,
+        "file_modified": 11,
+        "file_deleted": 0,
+        "file_renamed": 0,
+        "unique_files_modified": 11,
+        "process_events": 2,
+        "network_events": 3,
+        "established_connections": 3,
+        "unique_remote_ips": 1
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0115",
+      "scenario_id": "R10",
+      "label": 1,
+      "variation": {
+        "file_count": 10,
+        "delay_s": 0.06,
+        "extension": ".locked"
+      },
+      "start_time": "2026-08-20T18:21:30.727011+00:00",
+      "end_time": "2026-08-20T18:21:31.734119+00:00",
+      "event_count": 10,
+      "features": {
+        "total_events": 10,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 10,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0116",
+      "scenario_id": "R10",
+      "label": 1,
+      "variation": {
+        "file_count": 14,
+        "delay_s": 0.04,
+        "extension": ".encrypted"
+      },
+      "start_time": "2026-08-20T18:21:31.734583+00:00",
+      "end_time": "2026-08-20T18:21:33.142712+00:00",
+      "event_count": 14,
+      "features": {
+        "total_events": 14,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 14,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0117",
+      "scenario_id": "R10",
+      "label": 1,
+      "variation": {
+        "file_count": 18,
+        "delay_s": 0.03,
+        "extension": ".CRYPTED"
+      },
+      "start_time": "2026-08-20T18:21:33.143371+00:00",
+      "end_time": "2026-08-20T18:21:34.961760+00:00",
+      "event_count": 18,
+      "features": {
+        "total_events": 18,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 18,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0118",
+      "scenario_id": "R10",
+      "label": 1,
+      "variation": {
+        "file_count": 22,
+        "delay_s": 0.02,
+        "extension": ".paying"
+      },
+      "start_time": "2026-08-20T18:21:34.962750+00:00",
+      "end_time": "2026-08-20T18:21:37.177204+00:00",
+      "event_count": 22,
+      "features": {
+        "total_events": 22,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 22,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0119",
+      "scenario_id": "R10",
+      "label": 1,
+      "variation": {
+        "file_count": 12,
+        "delay_s": 0.05,
+        "extension": ".locked"
+      },
+      "start_time": "2026-08-20T18:21:37.178067+00:00",
+      "end_time": "2026-08-20T18:21:38.384965+00:00",
+      "event_count": 12,
+      "features": {
+        "total_events": 12,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 12,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    },
+    {
+      "session_id": "S_0120",
+      "scenario_id": "R10",
+      "label": 1,
+      "variation": {
+        "file_count": 16,
+        "delay_s": 0.04,
+        "extension": ".enc"
+      },
+      "start_time": "2026-08-20T18:21:38.385410+00:00",
+      "end_time": "2026-08-20T18:21:39.999099+00:00",
+      "event_count": 16,
+      "features": {
+        "total_events": 16,
+        "file_created": 0,
+        "file_modified": 0,
+        "file_deleted": 0,
+        "file_renamed": 16,
+        "unique_files_modified": 0,
+        "process_events": 0,
+        "network_events": 0,
+        "established_connections": 0,
+        "unique_remote_ips": 0
+      },
+      "feature_version": "1.0"
+    }
+  ]
+}
