@@ -16,6 +16,12 @@ Connects:
 
 No monitor code is modified.
 No containment is executed.
+
+Incident State Management:
+    - Only logs response/protection events on STATE TRANSITIONS
+    - Same active incident does NOT produce duplicate events
+    - Recovery to NORMAL is logged once
+    - A new distinct incident produces new events
 """
 
 import json
@@ -25,8 +31,17 @@ from datetime import datetime, timezone, timedelta
 
 from core.feature_extractor import extract_features
 from core.risk_engine import evaluate_risk
-from core.response_controller import process_risk_result
-from core.protection_controller import process_response
+from core.response_controller import (
+    process_risk_result,
+    determine_response,
+    log_response_decision,
+)
+from core.protection_controller import (
+    process_response,
+    determine_protection,
+    log_protection_decision,
+    simulate_containment,
+)
 
 
 PROJECT_ROOT = os.path.dirname(
@@ -41,6 +56,16 @@ LOG_FILE = os.path.join(
 
 WINDOW_SECONDS = 10
 POLL_INTERVAL = 1
+
+
+# =============================================================
+# INCIDENT STATE TRACKING
+# =============================================================
+# The incident signature captures the meaningful behavioral
+# state. If the signature hasn't changed, we do NOT log
+# duplicate response/protection events.
+
+_current_incident_signature = None
 
 
 def load_events():
@@ -106,9 +131,12 @@ def parse_timestamp(timestamp):
 def get_recent_events(events):
     """
     Return events inside the behavioral observation window.
+
+    Note: Events are logged with local time (no timezone).
+    We compare against local time to maintain consistency.
     """
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now()
 
     cutoff = (
         now -
@@ -119,14 +147,23 @@ def get_recent_events(events):
 
     for event in events:
 
-        timestamp = parse_timestamp(
-            event.get("timestamp")
-        )
+        ts_str = event.get("timestamp")
 
-        if timestamp is None:
+        if not isinstance(ts_str, str):
             continue
 
-        if timestamp >= cutoff:
+        try:
+            # Parse as naive local time (matching event_logger)
+            ts = datetime.fromisoformat(ts_str)
+
+            # Strip any timezone info for consistent comparison
+            if ts.tzinfo is not None:
+                ts = ts.replace(tzinfo=None)
+
+        except ValueError:
+            continue
+
+        if ts >= cutoff:
             recent.append(event)
 
     return recent
@@ -242,7 +279,41 @@ def print_risk_result(
     print("=" * 65)
 
 
+def _compute_incident_signature(risk_result):
+    """
+    Compute a stable signature for the current risk state.
+
+    The signature is based on:
+      - risk_level
+      - reason
+      - sorted signals
+
+    Timestamps are NOT included because they change every
+    second and would defeat deduplication.
+    """
+
+    return (
+        risk_result.get("risk_level", "NORMAL"),
+        risk_result.get("reason", ""),
+        tuple(sorted(risk_result.get("signals", [])))
+    )
+
+
 def evaluate_current_window():
+    """
+    Evaluate the current behavioral window with incident
+    state management.
+
+    Only logs response/protection events when the incident
+    state CHANGES (new incident or recovery).
+
+    The risk assessment is ALWAYS logged so the dashboard
+    can read the latest behavioral state.
+
+    Console output continues every cycle for live visibility.
+    """
+
+    global _current_incident_signature
 
     events = load_events()
 
@@ -258,13 +329,76 @@ def evaluate_current_window():
         features
     )
 
-    response_result, _ = process_risk_result(
+    # --------------------------------------------------
+    # INCIDENT STATE TRANSITION CHECK
+    # --------------------------------------------------
+
+    new_signature = _compute_incident_signature(
         risk_result
     )
 
-    protection_result, _, _ = process_response(
+    is_state_transition = (
+        new_signature != _current_incident_signature
+    )
+
+    # --------------------------------------------------
+    # ALWAYS: Determine response and protection
+    # (for console display and return value)
+    # --------------------------------------------------
+
+    response_result = determine_response(
+        risk_result
+    )
+
+    protection_result = determine_protection(
         response_result
     )
+
+    # --------------------------------------------------
+    # CONDITIONAL: Only log events on state transitions
+    # --------------------------------------------------
+
+    if is_state_transition:
+
+        # Log the risk assessment event
+        from core.risk_engine import log_risk_decision
+        log_risk_decision(risk_result, features)
+
+        # Log response recommendation
+        log_response_decision(response_result)
+
+        # Log protection decision
+        containment_result = {
+            "status": "NOT_REQUIRED",
+            "target": None,
+            "mode": protection_result["mode"]
+        }
+
+        if protection_result[
+            "protection_action"
+        ] == "LAB_CONTAINMENT_RECOMMENDED":
+            containment_result = simulate_containment(
+                None
+            )
+
+        log_protection_decision(
+            protection_result,
+            containment_result
+        )
+
+        # Update current incident state
+        _current_incident_signature = new_signature
+
+        if risk_result["risk_level"] != "NORMAL":
+            print(
+                "\n[INCIDENT] NEW state transition → "
+                f"{risk_result['risk_level']}"
+            )
+        else:
+            if _current_incident_signature is not None:
+                print(
+                    "\n[INCIDENT] State recovered → NORMAL"
+                )
 
     return (
         recent_events,
