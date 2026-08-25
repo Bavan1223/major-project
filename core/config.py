@@ -81,6 +81,11 @@ DRY_RUN = True
 # SAFE_LAB_MODE: All operations restricted to lab directories
 SAFE_LAB_MODE = True
 
+# AUTO_KILL_ON_CRITICAL: When True, automatically terminate the
+# suspect process when CRITICAL is confirmed (rule + ML agree).
+# Only kills processes that pass safety checks (blocklist/allowlist).
+AUTO_KILL_ON_CRITICAL = True
+
 # ==============================================================
 # CANARY
 # ==============================================================

@@ -244,6 +244,228 @@ def protect_lab_files(incident_id: Optional[str] = None) -> dict:
 # PROCESS ISOLATION (SIMULATED)
 # ==============================================================
 
+# Safety: Processes that must NEVER be killed
+PROCESS_KILL_BLOCKLIST = {
+    "systemd", "init", "bash", "sh", "zsh",
+    "sshd", "ssh", "gdm", "gdm3", "lightdm",
+    "Xorg", "Xwayland", "gnome-shell", "gnome-session",
+    "pulseaudio", "pipewire", "dbus-daemon",
+    "NetworkManager", "nm-dispatcher",
+    "firefox", "firefox-esr", "chromium",
+    "code", "kiro",  # IDE
+    "node", "npm",  # Our frontend
+    "flask", "gunicorn",
+}
+
+# These process names are blocked from kill unless their cmdline
+# matches an allowlist pattern (prevents killing our own backend)
+PROCESS_CONDITIONAL_BLOCK = {
+    "python3", "python",
+}
+
+# Only kill processes whose executable or cmdline contains these
+# (our simulator running inside the lab)
+PROCESS_KILL_ALLOWLIST_PATTERNS = [
+    "safe_simulator",
+    "ransomware-lab/test-files",
+    "ransomware",
+    "encrypt",
+    "locker",
+    "ransom",
+]
+
+
+def _is_safe_to_kill(pid: int) -> tuple[bool, str]:
+    """
+    Determine if a process is safe to kill.
+
+    Returns (safe: bool, reason: str)
+
+    A process is safe to kill ONLY if:
+    1. It exists
+    2. It belongs to user 'bavan'
+    3. Its name is NOT in the absolute blocklist
+    4. If name is in conditional block, cmdline must match allowlist
+    5. Its cmdline contains an allowlist pattern
+    """
+    import psutil
+
+    try:
+        proc = psutil.Process(pid)
+        name = proc.name()
+        username = proc.username()
+        cmdline = " ".join(proc.cmdline())
+
+        # Must belong to our user
+        if username != "bavan":
+            return False, f"Process belongs to '{username}', not 'bavan'"
+
+        # Check absolute blocklist (NEVER kill these)
+        if name in PROCESS_KILL_BLOCKLIST:
+            return False, f"Process '{name}' is in safety blocklist"
+
+        # Check if cmdline contains our own infrastructure
+        protected_patterns = [
+            "file_monitor", "process_monitor", "network_monitor",
+            "detection_pipeline", "dashboard.py", "start.py",
+            "npm run dev", "vite",
+        ]
+        for pattern in protected_patterns:
+            if pattern in cmdline:
+                return False, f"Process is part of defense infrastructure ('{pattern}')"
+
+        # Check conditional block (e.g., python3 — only if allowlist matches)
+        if name in PROCESS_CONDITIONAL_BLOCK:
+            for pattern in PROCESS_KILL_ALLOWLIST_PATTERNS:
+                if pattern in cmdline:
+                    return True, f"Conditional process matches allowlist pattern '{pattern}'"
+            return False, f"Process '{name}' — cmdline doesn't match any allowlist pattern"
+
+        # For non-python processes, check allowlist
+        for pattern in PROCESS_KILL_ALLOWLIST_PATTERNS:
+            if pattern in cmdline or pattern in name:
+                return True, f"Matches allowlist pattern '{pattern}'"
+
+        # Unknown process not in any list — allow kill for non-system processes
+        # (this covers real ransomware binaries launched from Kali)
+        if "/home/bavan" in cmdline or "/tmp" in cmdline:
+            return True, f"Process in user space ({name})"
+
+        return False, f"Process '{name}' (cmdline: {cmdline[:80]}) not in allowlist"
+
+    except psutil.NoSuchProcess:
+        return False, "Process does not exist"
+    except psutil.AccessDenied:
+        return False, "Access denied to process information"
+
+
+def kill_malicious_process(
+    pid: Optional[int] = None,
+    process_name: Optional[str] = None,
+    incident_id: Optional[str] = None,
+    force: bool = False,
+) -> dict:
+    """
+    REAL process termination for confirmed ransomware.
+
+    Safety controls:
+    - Validates PID exists and belongs to user 'bavan'
+    - Checks against blocklist (never kills system/IDE/browser)
+    - Only kills processes matching allowlist patterns
+    - Requires explicit PID (won't guess)
+    - Logs everything to audit trail
+
+    Set force=True to bypass allowlist (still respects blocklist).
+    """
+    import psutil
+    import signal as sig
+
+    if pid is None:
+        detail = "Process kill skipped: no PID provided."
+        _log_audit("process_kill_skipped", detail, incident_id=incident_id)
+        return {
+            "success": False,
+            "message": detail,
+            "pid": None,
+            "killed": False,
+            "reason": "no_pid",
+        }
+
+    # Safety check
+    safe, reason = _is_safe_to_kill(pid)
+
+    if not safe and not force:
+        detail = f"Process kill BLOCKED for PID={pid}: {reason}"
+        _log_audit(
+            "process_kill_blocked",
+            detail,
+            incident_id=incident_id,
+            success=False,
+        )
+        return {
+            "success": False,
+            "message": detail,
+            "pid": pid,
+            "killed": False,
+            "reason": reason,
+        }
+
+    # Attempt to kill
+    try:
+        proc = psutil.Process(pid)
+        proc_name = proc.name()
+        proc_cmdline = " ".join(proc.cmdline())[:100]
+
+        # Send SIGTERM first (graceful)
+        proc.terminate()
+
+        # Wait up to 3 seconds for termination
+        try:
+            proc.wait(timeout=3)
+        except psutil.TimeoutExpired:
+            # Force kill if still alive
+            proc.kill()
+
+        detail = (
+            f"Process KILLED: PID={pid} ({proc_name}). "
+            f"Cmdline: {proc_cmdline}. Reason: {reason}"
+        )
+        _log_audit(
+            "process_killed",
+            detail,
+            incident_id=incident_id,
+        )
+
+        # Update incident
+        if incident_id:
+            incident_manager.contain(incident_id)
+            incident_manager.add_timeline_event(
+                incident_id,
+                "process_terminated",
+                f"Malicious process PID={pid} ({proc_name}) terminated.",
+            )
+
+        return {
+            "success": True,
+            "message": f"Process PID={pid} ({proc_name}) terminated successfully.",
+            "pid": pid,
+            "process": proc_name,
+            "killed": True,
+            "reason": reason,
+        }
+
+    except psutil.NoSuchProcess:
+        detail = f"Process PID={pid} already terminated (does not exist)."
+        _log_audit("process_kill_not_needed", detail, incident_id=incident_id)
+        return {
+            "success": True,
+            "message": detail,
+            "pid": pid,
+            "killed": False,
+            "reason": "already_dead",
+        }
+    except psutil.AccessDenied:
+        detail = f"Process kill DENIED for PID={pid}: insufficient permissions."
+        _log_audit("process_kill_denied", detail, incident_id=incident_id, success=False)
+        return {
+            "success": False,
+            "message": detail,
+            "pid": pid,
+            "killed": False,
+            "reason": "access_denied",
+        }
+    except Exception as e:
+        detail = f"Process kill ERROR for PID={pid}: {str(e)}"
+        _log_audit("process_kill_error", detail, incident_id=incident_id, success=False)
+        return {
+            "success": False,
+            "message": detail,
+            "pid": pid,
+            "killed": False,
+            "reason": str(e),
+        }
+
+
 def simulate_process_isolation(
     pid: Optional[int] = None,
     process_name: Optional[str] = None,

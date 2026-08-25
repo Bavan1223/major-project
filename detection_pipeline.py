@@ -471,6 +471,36 @@ def evaluate_current_window():
                     affected_paths=affected_paths,
                     remote_endpoints=remote_endpoints,
                 )
+
+                # ------------------------------------------
+                # AUTO-KILL: Terminate suspect process on
+                # CRITICAL if configured and PID available
+                # ------------------------------------------
+                from core.config import AUTO_KILL_ON_CRITICAL
+                if (
+                    AUTO_KILL_ON_CRITICAL
+                    and risk_level == "CRITICAL"
+                    and risk_result.get("ml_contributed")
+                    and attributed_pid is not None
+                ):
+                    from core.prevention_engine import kill_malicious_process
+                    active_inc = incident_manager.get_active_incident()
+                    inc_id = active_inc["incident_id"] if active_inc else None
+                    kill_result = kill_malicious_process(
+                        pid=attributed_pid,
+                        process_name=attributed_process,
+                        incident_id=inc_id,
+                    )
+                    if kill_result.get("killed"):
+                        print(
+                            f"\n[PREVENTION] Process PID={attributed_pid} "
+                            f"TERMINATED (CRITICAL confirmed)"
+                        )
+                    else:
+                        print(
+                            f"\n[PREVENTION] Kill blocked: "
+                            f"{kill_result.get('reason', 'unknown')}"
+                        )
             else:
                 # Update existing incident risk
                 incident_manager.update_risk(

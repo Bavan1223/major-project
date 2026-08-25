@@ -785,6 +785,33 @@ def api_prevention_isolate_process():
     return jsonify(result)
 
 
+@app.route("/api/prevention/kill-process", methods=["POST"])
+def api_prevention_kill_process():
+    """
+    REAL process termination for confirmed ransomware.
+    Requires PID. Safety-checked against blocklist/allowlist.
+    """
+    from core.incident_manager import incident_manager
+    from core.prevention_engine import kill_malicious_process
+
+    data = request.get_json(silent=True) or {}
+    pid = data.get("pid")
+    force = data.get("force", False)
+
+    if pid is None:
+        return jsonify({"success": False, "message": "PID is required."}), 400
+
+    active = incident_manager.get_active_incident()
+    incident_id = active["incident_id"] if active else None
+
+    result = kill_malicious_process(
+        pid=int(pid),
+        incident_id=incident_id,
+        force=bool(force),
+    )
+    return jsonify(result)
+
+
 @app.route("/api/prevention/isolate-network", methods=["POST"])
 def api_prevention_isolate_network():
     """Simulate network isolation."""
