@@ -306,24 +306,83 @@ function mapNetwork(
 
 
   const remote =
+    event?.remote_address ||
     data.remote_address ||
     '-';
 
+
   const local =
+    event?.local_address ||
     data.local_address ||
     '-';
+
+
+  const status =
+    event?.status ||
+    data.status ||
+    'UNKNOWN';
+
+
+  const backendIndicator =
+    String(
+      event?.indicator ||
+      data.indicator ||
+      ''
+    ).toLowerCase();
+
+
+  /*
+   * ==========================================================
+   * REAL BACKEND INDICATORS
+   * ==========================================================
+   *
+   * Examples from /api/network:
+   *
+   * new_established_connection
+   * repeated_connection_to_endpoint
+   *
+   */
+
+
+  const isRepeated =
+    backendIndicator.includes(
+      'repeated_connection'
+    ) ||
+    backendIndicator.includes(
+      'repeated_network'
+    );
+
+
+  const isSuspicious =
+    isRepeated ||
+    backendIndicator.includes(
+      'suspicious'
+    ) ||
+    backendIndicator.includes(
+      'anomal'
+    );
 
 
   let indicator =
     'NORMAL';
 
 
-  if (
-    event?.event_type ===
-    'repeated_network_activity'
-  ) {
+  if (isRepeated) {
+
     indicator =
-      'SUSPICIOUS';
+      'repeated_connection_to_endpoint';
+
+  } else if (isSuspicious) {
+
+    indicator =
+      backendIndicator ||
+      'suspicious_network_activity';
+
+  } else if (backendIndicator) {
+
+    indicator =
+      backendIndicator;
+
   }
 
 
@@ -342,10 +401,12 @@ function mapNetwork(
 
     process:
       event?.process ||
+      data.process ||
       'Unknown',
 
     pid:
       event?.pid ??
+      data.pid ??
       0,
 
     localAddress:
@@ -355,14 +416,14 @@ function mapNetwork(
       remote,
 
     status:
-      data.status ||
-      'UNKNOWN',
+      status,
 
-    indicator,
+    indicator:
+      indicator,
 
-  } as NetworkConnection;
+  };
+
 }
-
 
 /*
  * ============================================================
