@@ -14,10 +14,14 @@ env/
 
 # Generated logs
 logs/*.jsonl
+logs/incidents.json
 
 # Generated test files
 test-files/*
 !test-files/.gitkeep
+
+# Recovery snapshots (runtime data)
+recovery/
 
 # Temporary / backup files
 *.disabled

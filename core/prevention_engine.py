@@ -92,7 +92,7 @@ def create_recovery_snapshot(incident_id: Optional[str] = None) -> dict:
     try:
         os.makedirs(SNAPSHOTS_DIR, exist_ok=True)
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
         snapshot_dir = os.path.join(SNAPSHOTS_DIR, f"snap_{timestamp}")
 
         if os.path.exists(LAB_DIR):
