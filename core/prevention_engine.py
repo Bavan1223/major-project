@@ -331,13 +331,15 @@ def kill_malicious_process(
     incident_id: Optional[str] = None,
 ) -> dict:
     """
-    Terminate a process that is operating on test-files/.
+    Terminate a process confirmed as ransomware by ML.
 
-    STRICT SAFETY:
-    - Only kills processes with active connection to test-files/
-    - Checks: open files, working directory, cmdline
-    - NEVER kills system processes, browser, IDE, or our infrastructure
-    - Everything is audit-logged
+    TWO CONDITIONS MUST BOTH BE TRUE:
+        1. ML has classified behavior as RANSOMWARE_LIKE (ml_contributed=True)
+        2. Process is actively operating on test-files/
+
+    If ML has NOT confirmed ransomware → process is NOT killed.
+    If process is NOT on test-files/ → process is NOT killed.
+    Both conditions required. No exceptions.
     """
     import psutil
 
@@ -352,7 +354,33 @@ def kill_malicious_process(
             "reason": "no_pid",
         }
 
-    # Safety check
+    # CONDITION 1: ML must confirm ransomware
+    active_inc = incident_manager.get_active_incident()
+    ml_confirmed = False
+    if active_inc:
+        ml_confirmed = active_inc.get("ml_contributed", False)
+
+    if not ml_confirmed:
+        detail = (
+            f"Process kill BLOCKED for PID={pid}: "
+            f"ML has NOT confirmed ransomware behavior. "
+            f"Kill requires ML classification = RANSOMWARE_LIKE."
+        )
+        _log_audit(
+            "process_kill_blocked_no_ml",
+            detail,
+            incident_id=incident_id,
+            success=False,
+        )
+        return {
+            "success": False,
+            "message": detail,
+            "pid": pid,
+            "killed": False,
+            "reason": "ml_not_confirmed",
+        }
+
+    # CONDITION 2: Process must be on test-files/
     safe, reason = _is_safe_to_kill(pid)
 
     if not safe:
