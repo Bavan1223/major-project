@@ -30,7 +30,7 @@ import hashlib
 # SAFETY: HARDCODED PATH — NEVER CHANGES
 # ==============================================================
 LAB_DIR = "/home/bavan/ransomware-lab/test-files"
-FILE_COUNT = 30
+FILE_COUNT = 50
 
 # Ransomware extension to simulate
 ENCRYPTED_EXT = ".locked"
@@ -218,7 +218,7 @@ def phase_4_rapid_burst():
     """
     print("[PHASE 4] Rapid burst modification wave...")
 
-    burst_count = 20
+    burst_count = 40
     modified = 0
 
     for i in range(burst_count):

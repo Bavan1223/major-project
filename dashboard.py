@@ -939,10 +939,48 @@ def api_health():
 
 
 # ============================================================
+# BACKGROUND DETECTION PIPELINE
+# ============================================================
+
+import threading
+
+def _background_detection_loop():
+    """
+    Runs the detection pipeline continuously in a background thread.
+    This ensures detection is ALWAYS active when the backend is running.
+    No need to run detection_pipeline.py separately.
+    """
+    import time
+    import sys
+    sys.path.insert(0, PROJECT_ROOT)
+
+    from core.config import POLL_INTERVAL
+
+    # Import pipeline functions
+    from detection_pipeline import evaluate_current_window
+
+    print("[DETECTION] Background detection pipeline started.")
+
+    while True:
+        try:
+            evaluate_current_window()
+        except Exception as e:
+            print(f"[DETECTION] Error: {e}")
+        time.sleep(POLL_INTERVAL)
+
+
+# ============================================================
 # MAIN
 # ============================================================
 
 if __name__ == "__main__":
+
+    # Start background detection thread
+    detection_thread = threading.Thread(
+        target=_background_detection_loop,
+        daemon=True,
+    )
+    detection_thread.start()
 
     print()
     print(
@@ -975,6 +1013,10 @@ if __name__ == "__main__":
 
     print(
         "Mode: SAFE / DRY-RUN"
+    )
+
+    print(
+        "Detection: ACTIVE (background thread)"
     )
 
     print()

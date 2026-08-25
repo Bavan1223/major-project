@@ -33,10 +33,10 @@ AUDIT_FILE = os.path.join(LOG_DIR, "audit.json")
 # ==============================================================
 
 # Observation window for behavioral analysis (seconds)
-WINDOW_SECONDS = 10
+WINDOW_SECONDS = 30
 
 # Detection pipeline polling interval (seconds)
-POLL_INTERVAL = 1
+POLL_INTERVAL = 2
 
 # ==============================================================
 # RISK THRESHOLDS
