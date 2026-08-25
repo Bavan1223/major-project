@@ -54,8 +54,8 @@ LOG_FILE = os.path.join(
     "events.jsonl"
 )
 
-WINDOW_SECONDS = 10
-POLL_INTERVAL = 1
+# Import from central config
+from core.config import WINDOW_SECONDS, POLL_INTERVAL
 
 
 # =============================================================

@@ -171,11 +171,44 @@ class IncidentManager:
     # ----------------------------------------------------------
 
     def get_active_incident(self) -> dict | None:
-        """Return the currently active incident, or None."""
+        """
+        Return the currently active incident, or None.
+
+        Includes staleness check: if the incident hasn't been
+        updated within INCIDENT_STALE_TIMEOUT seconds, it's
+        considered stale and auto-resolved.
+        """
         with self._lock:
             if self._active_incident_id:
                 inc = self._incidents.get(self._active_incident_id)
                 if inc and inc["status"] not in ("RESOLVED", "CLOSED"):
+                    # Staleness check
+                    from core.config import INCIDENT_STALE_TIMEOUT
+                    updated = inc.get("updated_at", "")
+                    if updated:
+                        try:
+                            updated_dt = datetime.fromisoformat(updated)
+                            age = (datetime.now() - updated_dt).total_seconds()
+                            if age > INCIDENT_STALE_TIMEOUT:
+                                # Auto-resolve stale incident
+                                inc["status"] = "RESOLVED"
+                                inc["recovery_status"] = "AUTO_RESOLVED"
+                                inc["updated_at"] = datetime.now().isoformat(
+                                    timespec="seconds"
+                                )
+                                inc["timeline"].append({
+                                    "timestamp": inc["updated_at"],
+                                    "action": "auto_resolved_stale",
+                                    "detail": (
+                                        f"Incident auto-resolved: no activity "
+                                        f"for {INCIDENT_STALE_TIMEOUT}s."
+                                    ),
+                                })
+                                self._active_incident_id = None
+                                self._save()
+                                return None
+                        except (ValueError, TypeError):
+                            pass
                     return inc
             return None
 
@@ -318,8 +351,29 @@ class IncidentManager:
             self._save()
 
     def clear_active(self) -> None:
-        """Clear the active incident pointer (on recovery to NORMAL)."""
+        """
+        Clear the active incident pointer on recovery to NORMAL.
+
+        Auto-resolves the incident if it was in OPEN or INVESTIGATING
+        state. CONTAINED incidents are resolved (recovery implied).
+        This prevents orphan incidents accumulating.
+        """
         with self._lock:
+            if self._active_incident_id:
+                inc = self._incidents.get(self._active_incident_id)
+                if inc and inc["status"] not in ("RESOLVED", "CLOSED"):
+                    now = datetime.now().isoformat(timespec="seconds")
+                    inc["status"] = "RESOLVED"
+                    inc["recovery_status"] = "AUTO_CLEARED"
+                    inc["updated_at"] = now
+                    inc["timeline"].append({
+                        "timestamp": now,
+                        "action": "auto_resolved_normal",
+                        "detail": (
+                            "Risk returned to NORMAL. "
+                            "Incident auto-resolved."
+                        ),
+                    })
             self._active_incident_id = None
             self._save()
 
