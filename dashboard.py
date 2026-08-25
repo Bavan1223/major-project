@@ -1,652 +1,54 @@
 from flask import Flask, Response, jsonify, render_template_string
+from flask_cors import CORS
 import json
 import os
+from datetime import datetime
+
 
 app = Flask(__name__)
 
+CORS(
+    app,
+    resources={
+        r"/api/*": {
+            "origins": [
+                "http://127.0.0.1:3000",
+                "http://localhost:3000",
+                "http://127.0.0.1:3001",
+                "http://localhost:3001",
+                "http://192.168.74.131:3000",
+                "http://192.168.74.131:3001",
+            ]
+        }
+    }
+)
+
+# ============================================================
+# PROJECT PATHS
+# ============================================================
+
+PROJECT_ROOT = os.path.dirname(
+    os.path.abspath(__file__)
+)
+
 LOG_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
+    PROJECT_ROOT,
     "logs",
     "events.jsonl"
 )
 
 
-HTML = """
-<!DOCTYPE html>
-<html>
-<head>
-
-    <title>Ransomware Defense SOC</title>
-
-    <meta charset="UTF-8">
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background: #05070a;
-            color: #d1d5db;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        .header {
-            padding: 20px 30px;
-            background: #090d12;
-            border-bottom: 1px solid #1f2937;
-        }
-
-        .title {
-            font-size: 26px;
-            font-weight: bold;
-            color: #e5e7eb;
-        }
-
-        .subtitle {
-            margin-top: 7px;
-            color: #6b7280;
-            font-size: 13px;
-        }
-
-        .status {
-            float: right;
-            color: #22c55e;
-            font-weight: bold;
-        }
-
-        .container {
-            padding: 25px;
-        }
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-
-        .card {
-            background: #0b1117;
-            border: 1px solid #1f2937;
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .label {
-            font-size: 12px;
-            color: #6b7280;
-            text-transform: uppercase;
-        }
-
-        .value {
-            font-size: 30px;
-            font-weight: bold;
-            margin-top: 8px;
-            color: #e5e7eb;
-        }
-
-        .risk {
-            margin-top: 20px;
-            padding: 22px;
-            background: #0b1117;
-            border: 1px solid #1f2937;
-            border-radius: 8px;
-        }
-
-        .risk-normal {
-            color: #22c55e;
-        }
-
-        .risk-high {
-            color: #ef4444;
-        }
-
-        .risk-title {
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .risk-description {
-            margin-top: 8px;
-            color: #9ca3af;
-        }
-
-        .section {
-            margin-top: 20px;
-            background: #0b1117;
-            border: 1px solid #1f2937;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .section-title {
-            padding: 15px 20px;
-            border-bottom: 1px solid #1f2937;
-            font-size: 15px;
-            font-weight: bold;
-            color: #9ca3af;
-            text-transform: uppercase;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            padding: 12px 15px;
-            color: #6b7280;
-            font-size: 11px;
-            border-bottom: 1px solid #1f2937;
-        }
-
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #111827;
-            font-size: 12px;
-        }
-
-        .red {
-            color: #ef4444;
-            font-weight: bold;
-        }
-
-        .green {
-            color: #22c55e;
-        }
-
-        .blue {
-            color: #60a5fa;
-        }
-
-        .yellow {
-            color: #facc15;
-        }
-
-        .muted {
-            color: #6b7280;
-        }
-
-        .mono {
-            font-family: monospace;
-        }
-
-        .live-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-
-        @media(max-width: 900px) {
-
-            .cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .container {
-                padding: 15px;
-            }
-
-            table {
-                font-size: 11px;
-            }
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-<div class="header">
-
-    <span class="status">
-        <span class="live-dot"></span>
-        LIVE MONITORING
-    </span>
-
-    <div class="title">
-        RANSOMWARE DEFENSE // SOC MONITOR
-    </div>
-
-    <div class="subtitle">
-        Protected Host: Ubuntu Linux |
-        IP: 192.168.74.131
-    </div>
-
-</div>
-
-
-<div class="container">
-
-
-    <!-- STATISTICS -->
-
-    <div class="cards">
-
-        <div class="card">
-
-            <div class="label">
-                File Events
-            </div>
-
-            <div class="value" id="file-count">
-                0
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="label">
-                Network Events
-            </div>
-
-            <div class="value" id="network-count">
-                0
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="label">
-                Detection Alerts
-            </div>
-
-            <div class="value" id="alert-count">
-                0
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="label">
-                System Status
-            </div>
-
-            <div class="value green">
-                ACTIVE
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- RISK -->
-
-    <div class="risk">
-
-        <div id="risk-title"
-             class="risk-title risk-normal">
-
-            🟢 SYSTEM NORMAL
-
-        </div>
-
-        <div id="risk-description"
-             class="risk-description">
-
-            No high-risk behavioral activity detected.
-
-        </div>
-
-    </div>
-
-
-    <!-- NETWORK -->
-
-    <div class="section">
-
-        <div class="section-title">
-            Network Activity
-        </div>
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>TIME</th>
-                    <th>SOURCE IP</th>
-                    <th>DESTINATION</th>
-                    <th>PID</th>
-                    <th>PROCESS</th>
-                    <th>STATUS</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody id="network-table">
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-
-    <!-- LIVE EVENTS -->
-
-    <div class="section">
-
-        <div class="section-title">
-            Live Event Stream
-        </div>
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>TIME</th>
-                    <th>SOURCE</th>
-                    <th>EVENT</th>
-                    <th>INDICATOR</th>
-                    <th>PID</th>
-                    <th>PROCESS</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody id="event-table">
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-
-</div>
-
-
-<script>
-
-
-function loadEvents() {
-
-    fetch("/api/events")
-
-        .then(response => response.json())
-
-        .then(data => {
-
-            updateDashboard(data);
-
-        })
-
-        .catch(error => {
-
-            console.log("Dashboard update error:", error);
-
-        });
-
-}
-
-
-function updateDashboard(data) {
-
-
-    /*
-     * Statistics
-     */
-
-    document.getElementById(
-        "file-count"
-    ).innerText = data.file_events;
-
-
-    document.getElementById(
-        "network-count"
-    ).innerText = data.network_events;
-
-
-    document.getElementById(
-        "alert-count"
-    ).innerText = data.alerts;
-
-
-    /*
-     * Risk
-     */
-
-    const riskTitle =
-        document.getElementById("risk-title");
-
-    const riskDescription =
-        document.getElementById("risk-description");
-
-
-    if (data.risk === "HIGH") {
-
-        riskTitle.className =
-            "risk-title risk-high";
-
-        riskTitle.innerText =
-            "🔴 HIGH RISK DETECTED";
-
-        riskDescription.innerText =
-            data.reason;
-
-    }
-
-    else {
-
-        riskTitle.className =
-            "risk-title risk-normal";
-
-        riskTitle.innerText =
-            "🟢 SYSTEM NORMAL";
-
-        riskDescription.innerText =
-            "No high-risk behavioral activity detected.";
-
-    }
-
-
-    /*
-     * Network table
-     */
-
-    const networkTable =
-        document.getElementById("network-table");
-
-    networkTable.innerHTML = "";
-
-
-    data.network_events_list.forEach(event => {
-
-        const row =
-            document.createElement("tr");
-
-
-        const d = event.data || {};
-
-
-        let local =
-            d.local_address || "-";
-
-        let remote =
-            d.remote_address || "-";
-
-
-        let sourceIP = "-";
-
-        let destination = remote;
-
-
-        if (remote.includes(":")) {
-
-            sourceIP =
-                remote.substring(
-                    0,
-                    remote.lastIndexOf(":")
-                );
-
-        }
-
-
-        row.innerHTML = `
-
-            <td class="mono">
-                ${event.timestamp || "-"}
-            </td>
-
-            <td class="blue mono">
-                ${sourceIP}
-            </td>
-
-            <td class="mono">
-                ${local}
-            </td>
-
-            <td>
-                ${event.pid ?? "None"}
-            </td>
-
-            <td>
-                ${event.process || "Unknown"}
-            </td>
-
-            <td class="green">
-                ${d.status || "-"}
-            </td>
-
-        `;
-
-
-        networkTable.appendChild(row);
-
-    });
-
-
-    /*
-     * Live event table
-     */
-
-    const eventTable =
-        document.getElementById("event-table");
-
-    eventTable.innerHTML = "";
-
-
-    data.recent_events.forEach(event => {
-
-        const row =
-            document.createElement("tr");
-
-
-        let sourceClass = "muted";
-
-
-        if (
-            event.source ===
-            "detection_engine"
-        ) {
-
-            sourceClass = "red";
-
-        }
-
-        else if (
-            event.source ===
-            "network_monitor"
-        ) {
-
-            sourceClass = "blue";
-
-        }
-
-        else if (
-            event.source ===
-            "file_monitor"
-        ) {
-
-            sourceClass = "yellow";
-
-        }
-
-
-        row.innerHTML = `
-
-            <td class="mono">
-                ${event.timestamp || "-"}
-            </td>
-
-            <td class="${sourceClass}">
-                ${event.source || "-"}
-            </td>
-
-            <td>
-                ${event.event_type || "-"}
-            </td>
-
-            <td>
-                ${event.indicator || "-"}
-            </td>
-
-            <td>
-                ${event.pid ?? "None"}
-            </td>
-
-            <td>
-                ${event.process || "Unknown"}
-            </td>
-
-        `;
-
-
-        eventTable.appendChild(row);
-
-    });
-
-}
-
-
-/*
- * Initial load
- */
-
-loadEvents();
-
-
-/*
- * Update every second
- */
-
-setInterval(
-    loadEvents,
-    1000
-);
-
-
-</script>
-
-
-</body>
-
-</html>
-"""
-
+# ============================================================
+# EVENT READER
+# ============================================================
 
 def read_events():
+    """
+    Read Common Events from the persistent JSONL log.
+
+    Invalid JSON lines are ignored so that one malformed
+    record does not break the dashboard.
+    """
 
     events = []
 
@@ -672,119 +74,567 @@ def read_events():
 
                     event = json.loads(line)
 
-                    events.append(event)
+                    if isinstance(event, dict):
+                        events.append(event)
 
                 except json.JSONDecodeError:
-
                     continue
 
     except OSError:
-
         pass
 
     return events
 
 
+# ============================================================
+# HELPERS
+# ============================================================
+
+def events_by_source(events, source):
+    """
+    Return events belonging to a specific monitor/source.
+    """
+
+    return [
+        event
+        for event in events
+        if event.get("source") == source
+    ]
+
+
+def latest_events(events, limit=20):
+    """
+    Return newest events first.
+    """
+
+    return list(reversed(events[-limit:]))
+
+
+def calculate_risk(events):
+    """
+    Dashboard-level risk summary.
+
+    Detection events generated by the detection engine
+    are treated as high-risk indicators.
+
+    This endpoint does NOT replace core/risk_engine.py.
+    The core risk engine remains authoritative for actual
+    project risk decisions.
+    """
+
+    detection_events = events_by_source(
+        events,
+        "detection_engine"
+    )
+
+    if detection_events:
+
+        latest_detection = detection_events[-1]
+
+        data = latest_detection.get(
+            "data",
+            {}
+        )
+
+        risk = data.get(
+            "risk",
+            "HIGH"
+        )
+
+        return {
+            "risk_level": risk,
+            "reason": (
+                latest_detection.get("indicator")
+                or latest_detection.get("event_type")
+                or "Suspicious behavior detected."
+            ),
+            "signals": [
+                latest_detection.get("indicator")
+            ]
+            if latest_detection.get("indicator")
+            else [],
+            "detected": True,
+            "timestamp": latest_detection.get(
+                "timestamp"
+            )
+        }
+
+    return {
+        "risk_level": "NORMAL",
+        "reason": (
+            "No currently implemented "
+            "high-risk behavioral activity detected."
+        ),
+        "signals": [],
+        "detected": False,
+        "timestamp": None
+    }
+
+
+def build_process_summary(events):
+    """
+    Build a lightweight process view from process-monitor
+    events and network/process attribution.
+
+    This does not claim that a process is currently alive
+    unless the event itself represents observed activity.
+    """
+
+    process_events = events_by_source(
+        events,
+        "process_monitor"
+    )
+
+    processes = {}
+
+    for event in process_events:
+
+        pid = event.get("pid")
+
+        if pid is None:
+            continue
+
+        processes[pid] = {
+            "pid": pid,
+            "name": event.get("process"),
+            "event_type": event.get("event_type"),
+            "indicator": event.get("indicator"),
+            "timestamp": event.get("timestamp"),
+            "data": event.get("data", {})
+        }
+
+    return list(
+        reversed(
+            list(processes.values())
+        )
+    )
+
+
+def build_file_summary(events):
+    """
+    Build a file-activity view from file monitor events.
+    """
+
+    file_events = events_by_source(
+        events,
+        "file_monitor"
+    )
+
+    result = []
+
+    for event in reversed(file_events[-100:]):
+
+        data = event.get(
+            "data",
+            {}
+        )
+
+        operation = event.get(
+            "event_type",
+            "unknown"
+        )
+
+        path = (
+            data.get("path")
+            or data.get("to")
+            or data.get("from")
+        )
+
+        result.append({
+            "id": (
+                f'{event.get("timestamp", "")}-'
+                f'{event.get("pid", "none")}-'
+                f'{len(result)}'
+            ),
+            "timestamp": event.get(
+                "timestamp"
+            ),
+            "operation": operation,
+            "path": path,
+            "pid": event.get("pid"),
+            "process": event.get("process"),
+            "indicator": event.get(
+                "indicator"
+            ),
+            "data": data
+        })
+
+    return result
+
+
+def build_network_summary(events):
+    """
+    Build a network-activity view from network-monitor
+    events.
+    """
+
+    network_events = events_by_source(
+        events,
+        "network_monitor"
+    )
+
+    result = []
+
+    for event in reversed(network_events[-100:]):
+
+        data = event.get(
+            "data",
+            {}
+        )
+
+        result.append({
+            "timestamp": event.get(
+                "timestamp"
+            ),
+            "pid": event.get(
+                "pid"
+            ),
+            "process": event.get(
+                "process"
+            ),
+            "indicator": event.get(
+                "indicator"
+            ),
+            "local_address": data.get(
+                "local_address"
+            ),
+            "remote_address": data.get(
+                "remote_address"
+            ),
+            "status": data.get(
+                "status"
+            ),
+            "data": data
+        })
+
+    return result
+
+
+# ============================================================
+# ROUTES
+# ============================================================
+
 @app.route("/")
 def dashboard():
+    """
+    Keep the old Flask dashboard available.
 
-    return render_template_string(HTML)
+    The new React SOC frontend runs separately on port 3000.
+    """
+
+    return render_template_string(
+        """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Ransomware Defense API</title>
+            <style>
+                body {
+                    background: #10131a;
+                    color: #e1e2ec;
+                    font-family: monospace;
+                    padding: 40px;
+                }
+                h1 {
+                    color: #ffb4ab;
+                }
+                li {
+                    margin: 12px 0;
+                }
+                code {
+                    color: #9ecaff;
+                }
+            </style>
+        </head>
+        <body>
+
+            <h1>RANSOMWARE DEFENSE // BACKEND API</h1>
+
+            <p>
+                Backend is running.
+            </p>
+
+            <h2>Available endpoints</h2>
+
+            <ul>
+                <li><code>/api/status</code></li>
+                <li><code>/api/events</code></li>
+                <li><code>/api/network</code></li>
+                <li><code>/api/processes</code></li>
+                <li><code>/api/files</code></li>
+                <li><code>/api/risk</code></li>
+            </ul>
+
+            <p>
+                React SOC frontend:
+                <code>http://127.0.0.1:3000</code>
+            </p>
+
+        </body>
+        </html>
+        """
+    )
 
 
 @app.route("/favicon.ico")
 def favicon():
 
-    return Response(status=204)
+    return Response(
+        status=204
+    )
 
+
+# ============================================================
+# STATUS API
+# ============================================================
+
+@app.route("/api/status")
+def api_status():
+
+    events = read_events()
+
+    file_events = events_by_source(
+        events,
+        "file_monitor"
+    )
+
+    network_events = events_by_source(
+        events,
+        "network_monitor"
+    )
+
+    process_events = events_by_source(
+        events,
+        "process_monitor"
+    )
+
+    detection_events = events_by_source(
+        events,
+        "detection_engine"
+    )
+
+    risk = calculate_risk(events)
+
+    return jsonify({
+
+        "status": "ONLINE",
+
+        "monitoring": True,
+
+        "safe_lab_mode": True,
+
+        "protection_mode": "DRY_RUN",
+
+        "event_count": len(events),
+
+        "file_event_count":
+            len(file_events),
+
+        "network_event_count":
+            len(network_events),
+
+        "process_event_count":
+            len(process_events),
+
+        "detection_event_count":
+            len(detection_events),
+
+        "risk_level":
+            risk["risk_level"],
+
+        "risk_reason":
+            risk["reason"],
+
+        "timestamp":
+            datetime.now().isoformat(
+                timespec="seconds"
+            )
+
+    })
+
+
+# ============================================================
+# EVENTS API
+# ============================================================
 
 @app.route("/api/events")
 def api_events():
 
     events = read_events()
 
-
-    file_events = sum(
-        1
-        for event in events
-        if event.get("source")
-        == "file_monitor"
+    file_events = events_by_source(
+        events,
+        "file_monitor"
     )
 
-
-    network_events = sum(
-        1
-        for event in events
-        if event.get("source")
-        == "network_monitor"
+    network_events = events_by_source(
+        events,
+        "network_monitor"
     )
 
-
-    alerts = sum(
-        1
-        for event in events
-        if event.get("source")
-        == "detection_engine"
+    detection_events = events_by_source(
+        events,
+        "detection_engine"
     )
 
-
-    risk = (
-        "HIGH"
-        if alerts > 0
-        else "NORMAL"
-    )
-
-
-    reason = (
-        "Rapid mass file modification detected."
-        if risk == "HIGH"
-        else "No high-risk behavioral activity detected."
-    )
-
-
-    network_events_list = [
-        event
-        for event in events
-        if event.get("source")
-        == "network_monitor"
-    ]
-
-    network_events_list = (
-        network_events_list[-10:]
-    )
-
-    network_events_list.reverse()
-
-
-    recent_events = events[-20:]
-
-    recent_events.reverse()
-
+    risk = calculate_risk(events)
 
     return jsonify({
 
+        "total_events":
+            len(events),
+
         "file_events":
-            file_events,
+            len(file_events),
 
         "network_events":
-            network_events,
+            len(network_events),
 
         "alerts":
-            alerts,
+            len(detection_events),
 
         "risk":
-            risk,
+            risk["risk_level"],
 
         "reason":
-            reason,
+            risk["reason"],
 
-        "network_events_list":
-            network_events_list,
+        "signals":
+            risk["signals"],
 
         "recent_events":
-            recent_events
+            latest_events(
+                events,
+                50
+            ),
+
+        "network_events_list":
+            latest_events(
+                network_events,
+                20
+            ),
+
+        "file_events_list":
+            latest_events(
+                file_events,
+                20
+            ),
+
+        "detection_events_list":
+            latest_events(
+                detection_events,
+                20
+            )
 
     })
 
+
+# ============================================================
+# NETWORK API
+# ============================================================
+
+@app.route("/api/network")
+def api_network():
+
+    events = read_events()
+
+    network_events = build_network_summary(
+        events
+    )
+
+    repeated_events = [
+        event
+        for event in events
+        if (
+            event.get("event_type")
+            == "repeated_network_activity"
+        )
+    ]
+
+    return jsonify({
+
+        "count":
+            len(network_events),
+
+        "connections":
+            network_events,
+
+        "repeated_activity":
+            latest_events(
+                repeated_events,
+                20
+            )
+
+    })
+
+
+# ============================================================
+# PROCESS API
+# ============================================================
+
+@app.route("/api/processes")
+def api_processes():
+
+    events = read_events()
+
+    processes = build_process_summary(
+        events
+    )
+
+    return jsonify({
+
+        "count":
+            len(processes),
+
+        "processes":
+            processes
+
+    })
+
+
+# ============================================================
+# FILE API
+# ============================================================
+
+@app.route("/api/files")
+def api_files():
+
+    events = read_events()
+
+    files = build_file_summary(
+        events
+    )
+
+    return jsonify({
+
+        "count":
+            len(files),
+
+        "files":
+            files
+
+    })
+
+
+# ============================================================
+# RISK API
+# ============================================================
+
+@app.route("/api/risk")
+def api_risk():
+
+    events = read_events()
+
+    risk = calculate_risk(
+        events
+    )
+
+    return jsonify(risk)
+
+
+# ============================================================
+# MAIN
+# ============================================================
 
 if __name__ == "__main__":
 
@@ -793,23 +643,40 @@ if __name__ == "__main__":
         "=========================================="
     )
     print(
-        " RANSOMWARE DEFENSE // SOC MONITOR"
+        " RANSOMWARE DEFENSE // BACKEND API"
     )
     print(
         "=========================================="
     )
     print()
+
     print(
-        "Dashboard:"
+        "API:"
         " http://127.0.0.1:5000"
     )
+
     print()
-    print("Live event source:")
+
     print(
-        " logs/events.jsonl"
+        "Event source:"
     )
+
+    print(
+        LOG_FILE
+    )
+
     print()
-    print("Press Ctrl+C to stop.")
+
+    print(
+        "Mode: SAFE / DRY-RUN"
+    )
+
+    print()
+
+    print(
+        "Press Ctrl+C to stop."
+    )
+
     print()
 
     app.run(

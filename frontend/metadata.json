@@ -1,0 +1,6 @@
+{
+  "name": "Ransomware Defense SOC",
+  "description": "Real-time Security Operations Center (SOC) dashboard for ransomware defense, behavioral anomaly detection, process inspection, network telemetry, and containment response.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
