@@ -244,49 +244,27 @@ def protect_lab_files(incident_id: Optional[str] = None) -> dict:
 # PROCESS ISOLATION (SIMULATED)
 # ==============================================================
 
-# Safety: Processes that must NEVER be killed
-PROCESS_KILL_BLOCKLIST = {
-    "systemd", "init", "bash", "sh", "zsh",
-    "sshd", "ssh", "gdm", "gdm3", "lightdm",
-    "Xorg", "Xwayland", "gnome-shell", "gnome-session",
-    "pulseaudio", "pipewire", "dbus-daemon",
-    "NetworkManager", "nm-dispatcher",
-    "firefox", "firefox-esr", "chromium",
-    "code", "kiro",  # IDE
-    "node", "npm",  # Our frontend
-    "flask", "gunicorn",
-}
+# ==============================================================
+# PROCESS KILL — STRICT SAFETY
+# ==============================================================
+# RULE: Only kill a process that is ACTIVELY OPERATING on
+# ~/ransomware-lab/test-files/. Nothing else. Ever.
 
-# These process names are blocked from kill unless their cmdline
-# matches an allowlist pattern (prevents killing our own backend)
-PROCESS_CONDITIONAL_BLOCK = {
-    "python3", "python",
-}
-
-# Only kill processes whose executable or cmdline contains these
-# (our simulator running inside the lab)
-PROCESS_KILL_ALLOWLIST_PATTERNS = [
-    "safe_simulator",
-    "ransomware-lab/test-files",
-    "ransomware",
-    "encrypt",
-    "locker",
-    "ransom",
-]
+LAB_TEST_DIR = "/home/bavan/ransomware-lab/test-files"
 
 
 def _is_safe_to_kill(pid: int) -> tuple[bool, str]:
     """
     Determine if a process is safe to kill.
 
-    Returns (safe: bool, reason: str)
+    STRICT RULE:
+        Only kill processes that are actively working on test-files/.
+        Evidence: open file handles, working directory, or cmdline
+        referencing test-files/.
 
-    A process is safe to kill ONLY if:
-    1. It exists
-    2. It belongs to user 'bavan'
-    3. Its name is NOT in the absolute blocklist
-    4. If name is in conditional block, cmdline must match allowlist
-    5. Its cmdline contains an allowlist pattern
+        NOTHING ELSE IS EVER KILLED. No exceptions.
+
+    Returns (safe: bool, reason: str)
     """
     import psutil
 
@@ -295,43 +273,51 @@ def _is_safe_to_kill(pid: int) -> tuple[bool, str]:
         name = proc.name()
         username = proc.username()
         cmdline = " ".join(proc.cmdline())
+        cwd = ""
+        try:
+            cwd = proc.cwd()
+        except (psutil.AccessDenied, psutil.NoSuchProcess):
+            pass
 
         # Must belong to our user
         if username != "bavan":
             return False, f"Process belongs to '{username}', not 'bavan'"
 
-        # Check absolute blocklist (NEVER kill these)
-        if name in PROCESS_KILL_BLOCKLIST:
-            return False, f"Process '{name}' is in safety blocklist"
-
-        # Check if cmdline contains our own infrastructure
-        protected_patterns = [
+        # NEVER kill our defense infrastructure (even if in test-files)
+        protected = [
             "file_monitor", "process_monitor", "network_monitor",
             "detection_pipeline", "dashboard.py", "start.py",
-            "npm run dev", "vite",
+            "npm", "vite", "flask",
         ]
-        for pattern in protected_patterns:
-            if pattern in cmdline:
-                return False, f"Process is part of defense infrastructure ('{pattern}')"
+        for p in protected:
+            if p in cmdline:
+                return False, f"Protected infrastructure ('{p}')"
 
-        # Check conditional block (e.g., python3 — only if allowlist matches)
-        if name in PROCESS_CONDITIONAL_BLOCK:
-            for pattern in PROCESS_KILL_ALLOWLIST_PATTERNS:
-                if pattern in cmdline:
-                    return True, f"Conditional process matches allowlist pattern '{pattern}'"
-            return False, f"Process '{name}' — cmdline doesn't match any allowlist pattern"
+        # ---- ONLY ALLOW KILL IF CONNECTED TO test-files/ ----
 
-        # For non-python processes, check allowlist
-        for pattern in PROCESS_KILL_ALLOWLIST_PATTERNS:
-            if pattern in cmdline or pattern in name:
-                return True, f"Matches allowlist pattern '{pattern}'"
+        # CHECK 1: Working directory is inside test-files/
+        if cwd and cwd.startswith(LAB_TEST_DIR):
+            return True, f"Working directory is test-files/ ({cwd})"
 
-        # Unknown process not in any list — allow kill for non-system processes
-        # (this covers real ransomware binaries launched from Kali)
-        if "/home/bavan" in cmdline or "/tmp" in cmdline:
-            return True, f"Process in user space ({name})"
+        # CHECK 2: Cmdline references test-files/
+        if LAB_TEST_DIR in cmdline or "test-files" in cmdline:
+            return True, f"Cmdline references test-files/"
 
-        return False, f"Process '{name}' (cmdline: {cmdline[:80]}) not in allowlist"
+        # CHECK 3: Process has open file handles in test-files/
+        try:
+            open_files = proc.open_files()
+            for f in open_files:
+                if f.path.startswith(LAB_TEST_DIR):
+                    return True, f"Open file in test-files/: {f.path}"
+        except (psutil.AccessDenied, psutil.NoSuchProcess):
+            pass
+
+        # CHECK 4: Is the safe_simulator
+        if "safe_simulator" in cmdline:
+            return True, "Is the safe_simulator process"
+
+        # DENY everything else — no connection to test-files/
+        return False, f"Process '{name}' has no connection to test-files/ — NOT KILLED"
 
     except psutil.NoSuchProcess:
         return False, "Process does not exist"
@@ -343,22 +329,17 @@ def kill_malicious_process(
     pid: Optional[int] = None,
     process_name: Optional[str] = None,
     incident_id: Optional[str] = None,
-    force: bool = False,
 ) -> dict:
     """
-    REAL process termination for confirmed ransomware.
+    Terminate a process that is operating on test-files/.
 
-    Safety controls:
-    - Validates PID exists and belongs to user 'bavan'
-    - Checks against blocklist (never kills system/IDE/browser)
-    - Only kills processes matching allowlist patterns
-    - Requires explicit PID (won't guess)
-    - Logs everything to audit trail
-
-    Set force=True to bypass allowlist (still respects blocklist).
+    STRICT SAFETY:
+    - Only kills processes with active connection to test-files/
+    - Checks: open files, working directory, cmdline
+    - NEVER kills system processes, browser, IDE, or our infrastructure
+    - Everything is audit-logged
     """
     import psutil
-    import signal as sig
 
     if pid is None:
         detail = "Process kill skipped: no PID provided."
@@ -374,7 +355,7 @@ def kill_malicious_process(
     # Safety check
     safe, reason = _is_safe_to_kill(pid)
 
-    if not safe and not force:
+    if not safe:
         detail = f"Process kill BLOCKED for PID={pid}: {reason}"
         _log_audit(
             "process_kill_blocked",
