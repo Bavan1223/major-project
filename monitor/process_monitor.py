@@ -4,7 +4,10 @@ import os
 import sys
 
 
-# Add project root to Python path
+# ============================================================
+# PROJECT PATH
+# ============================================================
+
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))
 )
@@ -14,8 +17,16 @@ sys.path.append(PROJECT_ROOT)
 from event_logger import log_event
 
 
+# ============================================================
+# CONFIGURATION
+# ============================================================
+
 SCAN_INTERVAL = 2
 
+
+# ============================================================
+# PROCESS INFORMATION
+# ============================================================
 
 def get_process_info(process):
     """
@@ -41,27 +52,41 @@ def get_process_info(process):
         return None
 
 
+# ============================================================
+# PROCESS MONITOR
+# ============================================================
+
 def monitor_processes():
 
     print("=== Ransomware Defense - Process Monitor ===")
     print("Monitoring running processes...")
     print("Press Ctrl+C to stop.\n")
 
-    # Establish a baseline of processes that already exist.
-# Existing processes are not reported as newly started.
-previous_pids = {
-    process.pid
-    for process in psutil.process_iter()
-}
 
-print(
-    f"Initial process baseline established: "
-    f"{len(previous_pids)} processes"
-)
+    # --------------------------------------------------------
+    # Establish baseline
+    # --------------------------------------------------------
 
-while True:
+    previous_pids = {
+        process.pid
+        for process in psutil.process_iter()
+    }
+
+
+    print(
+        f"Initial process baseline established: "
+        f"{len(previous_pids)} processes"
+    )
+
+
+    # --------------------------------------------------------
+    # Continuous monitoring
+    # --------------------------------------------------------
+
+    while True:
 
         current_pids = set()
+
 
         for process in psutil.process_iter():
 
@@ -70,11 +95,16 @@ while True:
             if info is None:
                 continue
 
+
             pid = info["pid"]
 
             current_pids.add(pid)
 
-            # Detect newly observed processes
+
+            # ------------------------------------------------
+            # Detect newly started process
+            # ------------------------------------------------
+
             if pid not in previous_pids:
 
                 print("[NEW PROCESS]")
@@ -82,6 +112,7 @@ while True:
                 print("PID  :", info["pid"])
                 print("EXE  :", info["exe"])
                 print("-" * 50)
+
 
                 log_event(
                     source="process_monitor",
@@ -96,10 +127,22 @@ while True:
                     }
                 )
 
+
+        # Update baseline
+
         previous_pids = current_pids
+
 
         time.sleep(SCAN_INTERVAL)
 
 
+# ============================================================
+# ENTRY POINT
+# ============================================================
+
 if __name__ == "__main__":
-    monitor_processes()
+    try:
+        monitor_processes()
+
+    except KeyboardInterrupt:
+        print("\nProcess monitor stopped.")
