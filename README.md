@@ -24,6 +24,8 @@ FILE MONITOR → PROCESS MONITOR → NETWORK MONITOR
        ↓               ↓                ↓
               EVENT LOGGER (events.jsonl)
                        ↓
+              DETECTION PIPELINE (1s loop)
+                       ↓
               FEATURE EXTRACTION
                        ↓
            ┌───────────┴───────────┐
@@ -36,14 +38,20 @@ FILE MONITOR → PROCESS MONITOR → NETWORK MONITOR
                        ↓
            ┌───────────┴───────────┐
            │                       │
-      RESPONSE              PROTECTION
-     CONTROLLER             CONTROLLER
+      CANARY CHECK         CORRELATION
            │                       │
            └───────────┬───────────┘
                        ↓
               INCIDENT MANAGER
                        ↓
-              PREVENTION ENGINE
+           ┌───────────┴───────────┐
+           │           │           │
+      RESPONSE    PREVENTION   RECOVERY
+     CONTROLLER    ENGINE      ENGINE
+           │           │           │
+           └───────────┬───────────┘
+                       ↓
+                  AUDIT LOG
                        ↓
                FLASK API (5000)
                        ↓
@@ -52,10 +60,10 @@ FILE MONITOR → PROCESS MONITOR → NETWORK MONITOR
 
 ## Requirements
 
-- Ubuntu Linux (VMware)
+- Ubuntu Linux (VMware recommended)
 - Python 3.11+
 - Node.js 18+
-- Virtual environment with dependencies
+- psutil, flask, flask-cors, scikit-learn, pandas, numpy, watchdog
 
 ## Installation
 
@@ -71,7 +79,6 @@ cd frontend && npm install && cd ..
 
 ### Backend API
 ```bash
-cd ~/ransomware-lab
 source .venv/bin/activate
 python3 dashboard.py
 # API at http://127.0.0.1:5000
@@ -79,21 +86,15 @@ python3 dashboard.py
 
 ### Frontend Dashboard
 ```bash
-cd ~/ransomware-lab/frontend
-npm run dev
+cd frontend && npm run dev
 # Dashboard at http://127.0.0.1:3000
 ```
 
 ### Monitors
 ```bash
-# Terminal 1: File Monitor
-python3 monitor/file_monitor.py
-
-# Terminal 2: Process Monitor
-python3 monitor/process_monitor.py
-
-# Terminal 3: Network Monitor
-python3 monitor/network_monitor.py
+python3 monitor/file_monitor.py       # File monitor (inotify)
+python3 monitor/process_monitor.py    # Process monitor (psutil)
+python3 monitor/network_monitor.py    # Network monitor (sockets)
 ```
 
 ### Detection Pipeline
@@ -105,8 +106,13 @@ python3 detection_pipeline.py
 ### Safe Simulation
 ```bash
 python3 simulator/safe_simulator.py
-# Creates/modifies 30 test files in test-files/
-# Triggers CRITICAL detection when pipeline is running
+# Modifies 30 test files → triggers CRITICAL detection
+```
+
+### Run Tests
+```bash
+python3 tests/test_system.py
+# 21 automated tests covering all subsystems
 ```
 
 ## Detection Logic
@@ -117,20 +123,28 @@ python3 simulator/safe_simulator.py
 | NORMAL | No suspicious behavior |
 | LOW | Minor file activity |
 | MEDIUM | Elevated activity or ML-only detection |
-| HIGH | Rule-based rapid mass file modification |
+| HIGH | Rule-based rapid mass file modification OR canary triggered |
 | CRITICAL | Rule HIGH + ML confident agreement |
 
 ### ML Policy
-- ML is **advisory only**, never authoritative
-- ML alone caps at MEDIUM (never CRITICAL alone)
+- ML is **advisory only**, never the sole authority
+- ML alone caps at HIGH (escalates MEDIUM → HIGH)
+- ML alone **never** reaches CRITICAL
+- CRITICAL requires: `rapid_mass_file_modification` (rule) + ML confirmation
 - ML threshold: 0.7
-- Rule HIGH + ML confident ransomware = CRITICAL
-- ML unavailable = rule-only (graceful degradation)
 
 ### Detection Signals
 - `rapid_mass_file_modification` — 10+ unique files modified rapidly
 - `multiple_unique_files_modified` — 10+ distinct file paths
-- `ml_ransomware_confirmed` — ML model confirms with high confidence
+- `ml_ransomware_confirmed` — ML confirms ransomware-like pattern
+- `canary_file_triggered` — Protected decoy file was modified/deleted
+
+### False-Positive Protection
+- Normal file editing (3 files): LOW — not CRITICAL
+- Browser traffic (50 connections): NORMAL
+- Git operations (4 files): LOW
+- Package installation (8 files): HIGH maximum (ML advisory, not CRITICAL)
+- CRITICAL is unreachable without `rapid_mass_file_modification`
 
 ## Incident Lifecycle
 
@@ -138,95 +152,122 @@ python3 simulator/safe_simulator.py
 OPEN → INVESTIGATING → CONTAINED → RESOLVED → CLOSED
 ```
 
-Each incident tracks:
-- Risk level, reason, signals
-- ML probability and contribution
-- File/process/network evidence
-- Timeline of all actions
-- Containment and recovery status
+Features:
+- Unique incident IDs (INC-XXXXXXXX)
+- Deduplication (one continuous episode = one incident)
+- Auto-resolve on NORMAL recovery
+- Stale timeout (60s without update = auto-resolve)
+- Timeline tracking for all state transitions
+- Persistence to disk (survives restart)
+
+## Canary/Honeypot System
+
+5 defensive decoy files deployed in `canary-files/`:
+- `canary_trap_passwords_backup.txt`
+- `canary_trap_financial_records.xlsx`
+- `canary_trap_private_keys.pem`
+- `canary_trap_database_export.sql`
+- `canary_trap_important_documents.docx`
+
+SHA-256 hash integrity monitoring. Any modification = HIGH-confidence signal.
 
 ## Prevention & Containment (DRY_RUN)
 
-All prevention operates safely within the lab:
+| Action | Description | Mode |
+|--------|-------------|------|
+| Protect Lab Files | Backup test-files/ to recovery/snapshots/ | REAL |
+| Process Isolation | Record isolation (no actual kill) | SIMULATED |
+| Network Isolation | Record recommendation (no firewall) | SIMULATED |
+| Recovery Snapshot | Real file copy within lab | REAL |
+| Restore Lab Files | Restore from snapshot + hash verify | REAL |
+| Containment | Orchestrates protect + isolate | DRY_RUN |
 
-| Action | Description |
-|--------|-------------|
-| Protect Lab Files | Backup test-files/ to recovery/snapshots/ |
-| Process Isolation | Record isolation (no actual kill) |
-| Network Isolation | Record recommendation (no firewall change) |
-| Recovery Snapshot | Real file copy within lab directory |
-| Restore Lab Files | Restore from latest snapshot |
+## Recovery
+
+- Real `shutil.copytree` snapshots of test-files/
+- Restore from latest snapshot
+- SHA-256 hash verification of restored content
+- Incident auto-resolves on successful recovery
 
 ## API Endpoints
 
 ### Status & Telemetry
-- `GET /api/status` — System state, risk level, incident info
-- `GET /api/events` — Event stream with counts
-- `GET /api/risk` — Current behavioral risk assessment
-- `GET /api/network` — Network connections
-- `GET /api/processes` — Process activity
-- `GET /api/files` — File activity
-- `GET /api/health` — Real system health (CPU, memory, component status)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/status` | GET | System state, risk, active incident |
+| `/api/events` | GET | Event stream with counts |
+| `/api/risk` | GET | Current behavioral risk + ML |
+| `/api/network` | GET | Network connections |
+| `/api/processes` | GET | Process activity |
+| `/api/files` | GET | File activity |
+| `/api/health` | GET | Real system health (CPU, mem, disk) |
+| `/api/canary` | GET | Canary/honeypot status |
+| `/api/correlation` | GET | Process-network correlations |
+| `/api/audit` | GET | Audit trail |
 
 ### Incidents
-- `GET /api/incidents` — All incidents
-- `GET /api/incidents/<id>` — Incident detail
-- `POST /api/incidents/<id>/acknowledge` — Transition to INVESTIGATING
-- `POST /api/incidents/<id>/contain` — Trigger safe containment
-- `POST /api/incidents/<id>/resolve` — Mark resolved
-- `POST /api/incidents/<id>/close` — Close incident
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/incidents` | GET | All incidents |
+| `/api/incidents/<id>` | GET | Incident detail |
+| `/api/incidents/<id>/acknowledge` | POST | → INVESTIGATING |
+| `/api/incidents/<id>/contain` | POST | → CONTAINED |
+| `/api/incidents/<id>/resolve` | POST | → RESOLVED |
+| `/api/incidents/<id>/close` | POST | → CLOSED |
 
 ### Prevention & Recovery
-- `POST /api/prevention/protect` — Protect lab files
-- `POST /api/prevention/isolate-process` — Simulate process isolation
-- `POST /api/prevention/isolate-network` — Simulate network isolation
-- `POST /api/recovery/snapshot` — Create recovery snapshot
-- `POST /api/recovery/restore` — Restore from snapshot
-- `POST /api/simulation/run` — Run safe simulator
-
-### Audit
-- `GET /api/audit` — Complete audit trail
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/prevention/protect` | POST | Protect lab files |
+| `/api/prevention/isolate-process` | POST | Simulate process isolation |
+| `/api/prevention/isolate-network` | POST | Simulate network isolation |
+| `/api/recovery/snapshot` | POST | Create recovery snapshot |
+| `/api/recovery/restore` | POST | Restore from snapshot |
+| `/api/simulation/run` | POST | Run safe simulator |
+| `/api/canary/reset` | POST | Redeploy canary files |
 
 ## Dashboard Pages
 
 | Page | Description |
 |------|-------------|
 | Overview | Risk status, engine status, telemetry counters |
-| Live Events | Real-time event stream with filters |
+| Live Events | Real-time event stream with severity filters |
 | File Activity | File operations, honeypot status |
 | Network Activity | Connections, repeated endpoints |
 | Process Activity | Process telemetry, inspector |
 | Detection & Risk | Signals, ML confidence, incident state |
 | Response | Containment controls, recovery actions |
-| Prevention | Full prevention center, incident lifecycle, audit log |
-| System Health | Real component status, host metrics |
+| Prevention | Full prevention center, incident lifecycle, audit |
+| System Health | Real component status, CPU/memory/disk metrics |
 
-## Demo Workflow
+## End-to-End Demo Workflow
 
 1. Start all monitors + backend + frontend + detection pipeline
 2. Dashboard shows NORMAL state
 3. Run `python3 simulator/safe_simulator.py`
-4. File monitor detects rapid modifications
-5. Rule engine triggers HIGH (rapid_mass_file_modification)
-6. ML confirms ransomware-like pattern (probability ~0.99)
+4. File monitor detects 30 rapid modifications
+5. Rule engine triggers: `rapid_mass_file_modification`
+6. ML confirms: RANSOMWARE_LIKE (probability ~0.99)
 7. Risk escalates to CRITICAL
-8. Incident created automatically
-9. Dashboard shows CRITICAL with real signals
-10. Use Prevention page: Acknowledge → Contain → Snapshot → Restore → Resolve → Close
-11. System recovers to NORMAL
-12. Audit log shows complete timeline
+8. Incident auto-created (INC-XXXXXXXX)
+9. Use Prevention page: Acknowledge → Contain → Snapshot → Restore → Resolve → Close
+10. System returns to NORMAL
+11. Audit log shows complete timeline
+12. Recovery verified with SHA-256 hash matching
 
 ## Project Structure
 
 ```
 ransomware-lab/
 ├── core/
-│   ├── incident_manager.py    # Incident lifecycle management
-│   ├── prevention_engine.py   # Safe containment, recovery, audit
+│   ├── config.py              # Unified configuration
+│   ├── canary_manager.py      # Honeypot/canary system
+│   ├── incident_manager.py    # Incident lifecycle
+│   ├── prevention_engine.py   # Containment, recovery, audit
 │   ├── risk_engine.py         # Rule + ML risk scoring
 │   ├── response_controller.py # Response recommendations
 │   ├── protection_controller.py # Protection decisions
-│   ├── feature_extractor.py   # Behavioral feature extraction
+│   ├── feature_extractor.py   # Behavioral features
 │   ├── correlation_engine.py  # Process/network/file correlation
 │   ├── audit_attributor.py    # Auditd-based attribution
 │   ├── event_collector.py     # In-memory event buffer
@@ -242,48 +283,63 @@ ransomware-lab/
 │   └── data/                  # Training datasets
 ├── simulator/
 │   └── safe_simulator.py      # Safe ransomware behavior simulation
-├── frontend/
-│   └── src/                   # React + Vite SOC dashboard
-├── logs/
-│   └── events.jsonl           # Central telemetry log
+├── tests/
+│   └── test_system.py         # Automated test suite (21 tests)
+├── frontend/src/              # React + Vite SOC dashboard
+├── logs/                      # Runtime event/incident logs
 ├── test-files/                # Controlled lab test directory
+├── canary-files/              # Deployed canary/honeypot files
 ├── recovery/                  # Recovery snapshots
 ├── dashboard.py               # Flask API backend
 ├── detection_pipeline.py      # Live detection loop
 ├── detection_engine.py        # Threshold detection
-└── event_logger.py            # Event creation & persistence
+├── event_logger.py            # Event creation & persistence
+└── main.py                    # Entry point (runs tests)
 ```
 
 ## Testing
 
 ```bash
-# Syntax validation
-python3 -m py_compile detection_pipeline.py
-python3 -m py_compile dashboard.py
-python3 -m py_compile core/incident_manager.py
-python3 -m py_compile core/prevention_engine.py
-
-# Frontend build
-cd frontend && npx vite build
-
-# End-to-end: Run simulator then check detection pipeline output
-python3 simulator/safe_simulator.py
-# Expected: CRITICAL detection with ML probability ~0.99
+python3 tests/test_system.py    # 21 automated tests
+python3 main.py                 # Same (runs test suite)
 ```
 
-## Key Design Decisions
+Test coverage:
+- Risk engine levels (5 tests)
+- ML integration (3 tests)
+- Incident lifecycle (4 tests)
+- Canary system (2 tests)
+- Feature extraction (1 test)
+- Recovery with hash verification (1 test)
+- API state consistency (3 tests)
+- False-positive resistance (2 tests)
 
-1. **DRY_RUN everywhere** — No destructive actions in the lab
-2. **Incident deduplication** — Same behavioral state = one incident, not repeated events
-3. **ML is advisory** — Never escalates beyond MEDIUM alone
-4. **Real telemetry only** — No fabricated evidence or fake forensic data
-5. **Safe simulation** — Modifies plain text files, no encryption
-6. **Timestamp consistency** — Local time throughout to avoid timezone bugs
+## Architectural Decisions
+
+1. **Incident Manager is the source of truth** for current risk. Historical events are history, not current state.
+2. **Stale incident timeout** (60s) auto-resolves incidents when the pipeline stops.
+3. **Orphan incident prevention** — `clear_active()` auto-resolves rather than leaving OPEN.
+4. **DRY_RUN everywhere** — No destructive enforcement without explicit configuration.
+5. **ML is advisory** — Never escalates beyond HIGH alone. CRITICAL requires rule confirmation.
+6. **Real telemetry only** — No fabricated evidence, no fake forensic data.
+7. **Honest attribution** — Reports "unavailable" when process attribution cannot be determined.
+8. **Consistent timestamps** — Local time throughout to avoid timezone bugs.
+
+## Known Limitations
+
+| Limitation | Status | Notes |
+|-----------|--------|-------|
+| Process attribution for file events | LIMITED | inotify doesn't provide PID; auditd required |
+| Network containment | SIMULATED | DRY_RUN only, no real firewall rules |
+| Process containment | SIMULATED | DRY_RUN only, no actual kill |
+| ML model training data | OFFLINE | Model trained on behavioral dataset, not live Ubuntu data |
+| Canary monitoring | POLLING | Checked each pipeline cycle, not real-time inotify |
 
 ## Technology Stack
 
-- **Backend**: Python 3.11, Flask, psutil, watchdog
+- **Backend**: Python 3.12, Flask, psutil, watchdog
 - **ML**: scikit-learn Random Forest classifier
 - **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Lucide icons
 - **Monitoring**: inotify (files), psutil (processes), socket (network)
-- **Storage**: JSONL event log, JSON incident persistence
+- **Storage**: JSONL event log, JSON incident/audit persistence
+- **Safety**: DRY_RUN default, SAFE_LAB_MODE, path validation
