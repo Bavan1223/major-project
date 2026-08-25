@@ -417,11 +417,41 @@ def evaluate_current_window():
         )
 
         if risk_level not in ("NORMAL", "LOW"):
+            # --------------------------------------------------
+            # EVIDENCE COLLECTION (process attribution + paths)
+            # --------------------------------------------------
+            attributed_process = None
+            attributed_pid = None
+            affected_paths = []
+            remote_endpoints = []
+
+            for ev in recent_events:
+                # Collect affected file paths
+                if ev.get("source") == "file_monitor":
+                    path = ev.get("data", {}).get("path")
+                    if path and path not in affected_paths:
+                        affected_paths.append(path)
+                    # Attempt process attribution from file events
+                    if ev.get("process") and ev["process"] != "Unknown":
+                        attributed_process = ev["process"]
+                    if ev.get("pid"):
+                        attributed_pid = ev["pid"]
+
+                # Collect network endpoints
+                elif ev.get("source") == "network_monitor":
+                    remote = ev.get("data", {}).get("remote_address")
+                    if remote and remote not in remote_endpoints:
+                        remote_endpoints.append(remote)
+
+            # Limit affected paths for storage
+            affected_paths = affected_paths[:50]
+            remote_endpoints = remote_endpoints[:20]
+
             # Check if there's already an active incident
             active = incident_manager.get_active_incident()
 
             if active is None:
-                # Create a new incident
+                # Create a new incident with evidence
                 incident_manager.create_incident(
                     risk_level=risk_level,
                     reason=risk_result["reason"],
@@ -430,12 +460,16 @@ def evaluate_current_window():
                     ml_contributed=risk_result.get(
                         "ml_contributed", False
                     ),
+                    process=attributed_process,
+                    pid=attributed_pid,
                     file_count=features.get(
                         "unique_files_modified", 0
                     ),
                     network_count=features.get(
                         "network_events", 0
                     ),
+                    affected_paths=affected_paths,
+                    remote_endpoints=remote_endpoints,
                 )
             else:
                 # Update existing incident risk

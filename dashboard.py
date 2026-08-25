@@ -879,6 +879,28 @@ def api_canary_reset():
 
 
 # ============================================================
+# CORRELATION API
+# ============================================================
+
+@app.route("/api/correlation")
+def api_correlation():
+    """Return process-network correlation data."""
+    from core.correlation_engine import correlate_process_network
+    try:
+        correlations = correlate_process_network()
+        return jsonify({
+            "count": len(correlations),
+            "correlations": correlations[:50],
+        })
+    except Exception as e:
+        return jsonify({
+            "count": 0,
+            "correlations": [],
+            "error": str(e),
+        })
+
+
+# ============================================================
 # HEALTH API
 # ============================================================
 
