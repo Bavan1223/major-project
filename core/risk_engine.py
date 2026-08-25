@@ -98,7 +98,15 @@ def evaluate_risk(features):
         )
 
     # --------------------------------------------------
-    # CURRENT SEVERITY DECISION (EXISTING — UNCHANGED)
+    # CANARY / HONEYPOT SIGNAL
+    # --------------------------------------------------
+
+    canary_events = features.get("canary_events", 0)
+    if canary_events > 0:
+        signals.append("canary_file_triggered")
+
+    # --------------------------------------------------
+    # CURRENT SEVERITY DECISION
     # --------------------------------------------------
 
     # HIGH:
@@ -108,6 +116,15 @@ def evaluate_risk(features):
         reason = (
             "Rapid mass modification of multiple "
             "unique files detected."
+        )
+
+    # HIGH:
+    # Canary file triggered (strong independent signal)
+    elif "canary_file_triggered" in signals:
+        risk_level = "HIGH"
+        reason = (
+            "Protected canary/honeypot file was modified "
+            "or deleted — high-confidence malicious activity."
         )
 
     # MEDIUM:

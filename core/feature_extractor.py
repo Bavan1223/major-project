@@ -25,7 +25,9 @@ def extract_features(events):
         "established_connections": 0,
         "unique_remote_ips": 0,
 
-        "suspicious_indicators": 0
+        "suspicious_indicators": 0,
+
+        "canary_events": 0,
     }
 
     modified_files = set()
@@ -105,6 +107,17 @@ def extract_features(events):
         }:
 
             features["suspicious_indicators"] += 1
+
+        # -------------------------
+        # CANARY / HONEYPOT
+        # -------------------------
+
+        if indicator in {
+            "canary_triggered",
+            "canary_modified",
+            "canary_deleted",
+        }:
+            features["canary_events"] += 1
 
     features["unique_files_modified"] = len(modified_files)
     features["unique_remote_ips"] = len(remote_ips)

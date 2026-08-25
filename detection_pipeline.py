@@ -330,6 +330,24 @@ def evaluate_current_window():
     )
 
     # --------------------------------------------------
+    # CANARY CHECK
+    # --------------------------------------------------
+    # Check canary files each cycle. If triggered and not
+    # already in the features (from event log), inject
+    # the canary signal into features for risk evaluation.
+
+    try:
+        from core.canary_manager import canary_manager
+        canary_status = canary_manager.check_canaries()
+        if canary_status.get("triggered") and features.get("canary_events", 0) == 0:
+            # Canary triggered but no event in log yet — inject signal
+            features["canary_events"] = len(canary_status.get("triggered_files", []))
+            # Re-evaluate risk with canary signal
+            risk_result = evaluate_risk(features)
+    except Exception:
+        pass  # Canary check failure is non-fatal
+
+    # --------------------------------------------------
     # INCIDENT STATE TRANSITION CHECK
     # --------------------------------------------------
 

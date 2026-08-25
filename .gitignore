@@ -24,6 +24,9 @@ test-files/*
 # Recovery snapshots (runtime data)
 recovery/
 
+# Canary files (deployed at runtime)
+canary-files/
+
 # Temporary / backup files
 *.disabled
 *.backup

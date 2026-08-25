@@ -857,6 +857,28 @@ def api_audit():
 
 
 # ============================================================
+# CANARY API
+# ============================================================
+
+@app.route("/api/canary")
+def api_canary():
+    """Return canary/honeypot status."""
+    from core.canary_manager import canary_manager
+    status = canary_manager.check_canaries()
+    return jsonify(status)
+
+
+@app.route("/api/canary/reset", methods=["POST"])
+def api_canary_reset():
+    """Reset canary files (redeploy after incident)."""
+    from core.canary_manager import canary_manager
+    from core.prevention_engine import _log_audit
+    result = canary_manager.reset()
+    _log_audit("canary_reset", "Canary files redeployed.")
+    return jsonify({"success": True, "canary": result})
+
+
+# ============================================================
 # HEALTH API
 # ============================================================
 
