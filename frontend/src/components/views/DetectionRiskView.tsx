@@ -1,19 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSoc } from '../../context/SocContext';
 import {
   AlertTriangle,
   ShieldAlert,
-  Lock,
+  Shield,
   Activity,
-  Flame,
   CheckCircle,
   FileWarning,
-  Trash2,
-  KeyRound,
-  Check,
-  RotateCcw,
+  Brain,
   Zap,
+  RotateCcw,
+  Lock,
+  Eye,
 } from 'lucide-react';
+
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  'http://192.168.74.131:5000';
+
+/*
+ * Signal display metadata.
+ * Maps backend signal names to human-readable labels.
+ */
+const SIGNAL_LABELS: Record<string, { label: string; description: string }> = {
+  rapid_mass_file_modification: {
+    label: 'Rapid Mass File Modification',
+    description: 'Multiple files modified in rapid succession within the observation window.',
+  },
+  multiple_unique_files_modified: {
+    label: 'Multiple Unique Files Modified',
+    description: '10 or more unique files were modified in the behavioral window.',
+  },
+  ml_ransomware_confirmed: {
+    label: 'ML Ransomware Classification Confirmed',
+    description: 'Machine learning model confirmed ransomware-like behavioral pattern with high confidence.',
+  },
+  ml_ransomware_detected: {
+    label: 'ML Ransomware Pattern Detected',
+    description: 'ML model detected ransomware-like behavior (no rule-based confirmation).',
+  },
+};
+
+/*
+ * Risk level severity colors and labels.
+ */
+const RISK_CONFIG: Record<string, {
+  bg: string;
+  border: string;
+  text: string;
+  badge: string;
+  label: string;
+}> = {
+  CRITICAL: {
+    bg: 'bg-[#93000a]/20',
+    border: 'border-[#ffb4ab]',
+    text: 'text-[#ffb4ab]',
+    badge: 'bg-[#93000a]',
+    label: 'CRITICAL',
+  },
+  HIGH: {
+    bg: 'bg-[#df7412]/15',
+    border: 'border-[#ffb786]',
+    text: 'text-[#ffb786]',
+    badge: 'bg-[#df7412]/60',
+    label: 'HIGH',
+  },
+  MEDIUM: {
+    bg: 'bg-[#625b00]/15',
+    border: 'border-[#e5c349]',
+    text: 'text-[#e5c349]',
+    badge: 'bg-[#625b00]/60',
+    label: 'MEDIUM',
+  },
+  LOW: {
+    bg: 'bg-[#1d2027]',
+    border: 'border-[#424754]',
+    text: 'text-[#adc6ff]',
+    badge: 'bg-[#272a31]',
+    label: 'LOW',
+  },
+  NORMAL: {
+    bg: 'bg-[#1d2027]',
+    border: 'border-[#4edea3]/40',
+    text: 'text-[#4edea3]',
+    badge: 'bg-[#00a572]/30',
+    label: 'NORMAL',
+  },
+};
+
+interface RiskData {
+  risk_level: string;
+  reason: string;
+  signals: string[];
+  detected: boolean;
+  timestamp: string | null;
+  ml_contributed?: boolean;
+}
 
 export const DetectionRiskView: React.FC = () => {
   const {
@@ -21,224 +103,305 @@ export const DetectionRiskView: React.FC = () => {
     triggerContainment,
     restoreHost,
     actionLogs,
-    simulateAttack,
-    resetSimulation,
   } = useSoc();
 
-  const [containmentSuccess, setContainmentSuccess] = useState(false);
-  const [selectedPlanItems, setSelectedPlanItems] = useState({
-    isolate: true,
-    killTree: true,
-    restoreShadow: true,
-    quarantine: true,
+  const [riskData, setRiskData] = useState<RiskData>({
+    risk_level: 'NORMAL',
+    reason: 'No suspicious behavior detected.',
+    signals: [],
+    detected: false,
+    timestamp: null,
   });
+
+  const [statusData, setStatusData] = useState<any>(null);
+
+  /*
+   * Fetch real risk state from backend.
+   */
+  const fetchRisk = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/risk`, {
+        cache: 'no-store',
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setRiskData(data);
+    } catch (error) {
+      console.error('DetectionRiskView: risk fetch error', error);
+    }
+  }, []);
+
+  const fetchStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/status`, {
+        cache: 'no-store',
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setStatusData(data);
+    } catch (error) {
+      console.error('DetectionRiskView: status fetch error', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRisk();
+    fetchStatus();
+    const interval = window.setInterval(() => {
+      fetchRisk();
+      fetchStatus();
+    }, 2000);
+    return () => window.clearInterval(interval);
+  }, [fetchRisk, fetchStatus]);
+
+  const riskLevel = riskData.risk_level || 'NORMAL';
+  const config = RISK_CONFIG[riskLevel] || RISK_CONFIG.NORMAL;
+  const isActive = riskData.detected && riskLevel !== 'NORMAL' && riskLevel !== 'LOW';
+  const mlConfidence = systemStatus.confidence || 0;
+  const incidentCount = statusData?.detection_event_count || 0;
+  const protectionMode = statusData?.protection_mode || 'DRY_RUN';
 
   const handleAuthorize = () => {
     triggerContainment();
-    setContainmentSuccess(true);
   };
 
   return (
     <div className="flex flex-col w-full p-4 gap-3 bg-[#10131a] min-h-[calc(100vh-64px)] select-none">
+
       {/* Top Banner / Incident Header */}
-      <div className="bg-[#93000a]/20 border border-[#ffb4ab] rounded p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
+      <div className={`${config.bg} border ${config.border} rounded p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden`}>
         <div className="flex items-center gap-4 z-10">
-          <div className="w-12 h-12 rounded bg-[#ffb4ab]/20 border border-[#ffb4ab] flex items-center justify-center text-[#ffb4ab] shrink-0">
-            <AlertTriangle className="w-7 h-7 animate-pulse" />
+          <div className={`w-12 h-12 rounded ${config.bg} border ${config.border} flex items-center justify-center ${config.text} shrink-0`}>
+            {isActive ? (
+              <AlertTriangle className="w-7 h-7 animate-pulse" />
+            ) : (
+              <Shield className="w-7 h-7" />
+            )}
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="bg-[#93000a] text-[#ffdad6] text-[10px] font-mono font-bold px-2 py-0.5 rounded border border-[#ffb4ab]/40">
-                CRITICAL SEVERITY
+              <span className={`${config.badge} ${config.text} text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${config.border}/40`}>
+                {config.label} SEVERITY
               </span>
               <span className="text-[#adc6ff] text-[10px] font-mono bg-[#191b23] px-2 py-0.5 rounded border border-[#424754]">
                 HOST: 192.168.74.131
               </span>
               <span className="text-[#ffb786] text-[10px] font-mono bg-[#191b23] px-2 py-0.5 rounded border border-[#424754]">
-                INC-2023-891A
+                MODE: {protectionMode}
               </span>
               {systemStatus.hostIsolated && (
                 <span className="text-[#4edea3] text-[10px] font-mono bg-[#00a572]/20 px-2 py-0.5 rounded border border-[#4edea3]/40 flex items-center gap-1 font-bold">
-                  <CheckCircle className="w-3 h-3" /> THREAT CONTAINED
+                  <CheckCircle className="w-3 h-3" /> CONTAINED (DRY-RUN)
                 </span>
               )}
             </div>
-            <h1 className="text-[20px] font-bold text-[#ffb4ab] tracking-tight">
-              INC-2023-891A: ACTIVE ENCRYPTION &amp; SHADOW COPY DELETION
+            <h1 className={`text-[20px] font-bold ${config.text} tracking-tight`}>
+              {isActive
+                ? 'RANSOMWARE-LIKE BEHAVIORAL ACTIVITY DETECTED'
+                : 'NO ACTIVE THREAT DETECTED — SYSTEM NORMAL'}
             </h1>
           </div>
         </div>
 
         <div className="flex items-center gap-3 z-10">
-          {systemStatus.hostIsolated ? (
-            <button
-              onClick={restoreHost}
-              className="bg-[#272a31] border border-[#424754] text-[#e1e2ec] font-mono text-[11px] font-bold px-4 py-2 rounded hover:bg-[#32353c] flex items-center gap-1.5"
-            >
-              <RotateCcw className="w-3.5 h-3.5" /> RESTORE HOST STATE
-            </button>
-          ) : (
-            <button
-              onClick={handleAuthorize}
-              className="bg-[#ffb4ab] text-[#690005] font-mono text-[12px] font-bold px-5 py-2.5 rounded shadow-lg hover:bg-white transition-all flex items-center gap-2 animate-pulse"
-            >
-              <Lock className="w-4 h-4" /> AUTHORIZE CONTAINMENT
-            </button>
+          {isActive && (
+            systemStatus.hostIsolated ? (
+              <button
+                onClick={restoreHost}
+                className="bg-[#272a31] border border-[#424754] text-[#e1e2ec] font-mono text-[11px] font-bold px-4 py-2 rounded hover:bg-[#32353c] flex items-center gap-1.5"
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> RESTORE HOST STATE
+              </button>
+            ) : (
+              <button
+                onClick={handleAuthorize}
+                className="bg-[#ffb4ab] text-[#690005] font-mono text-[12px] font-bold px-5 py-2.5 rounded shadow-lg hover:bg-white transition-all flex items-center gap-2"
+              >
+                <Lock className="w-4 h-4" /> AUTHORIZE CONTAINMENT (DRY-RUN)
+              </button>
+            )
           )}
         </div>
 
         {/* Glow */}
-        <div className="absolute right-0 top-0 w-96 h-96 bg-[#ffb4ab]/5 blur-3xl pointer-events-none" />
+        {isActive && (
+          <div className="absolute right-0 top-0 w-96 h-96 bg-[#ffb4ab]/5 blur-3xl pointer-events-none" />
+        )}
       </div>
 
-      {/* Narrative & High Level Analysis */}
+      {/* Detection Reason */}
       <div className="bg-[#1d2027] border border-[#424754] rounded p-4 space-y-2">
         <div className="flex items-center justify-between">
           <div className="font-mono text-[10px] font-bold text-[#adc6ff] uppercase tracking-widest flex items-center gap-1.5">
-            <Activity className="w-3.5 h-3.5" /> BEHAVIORAL ANALYSIS NARRATIVE
+            <Activity className="w-3.5 h-3.5" /> BEHAVIORAL ANALYSIS
           </div>
           <span className="font-mono text-[10px] text-[#c2c6d6]">
-            Algorithm: Random Forest + AST Graph Anomaly
+            Engine: Rule-Based + Random Forest ML
           </span>
         </div>
-        <p className="text-[13px] text-[#e1e2ec] leading-relaxed">
-          At 14:22:15 UTC, process <span className="text-[#ffb4ab] font-mono font-bold">PID 8934 (vssadmin.exe)</span> executed a shadow copy wipe command (<code className="text-[#ffb786] bg-[#10131a] px-1 py-0.5 rounded">Delete Shadows /All /Quiet</code>). Concurrently, <span className="text-[#ffb4ab] font-mono font-bold">PID 8842 (svchost.exe masquerading)</span> initiated rapid file overwrites across <code className="text-[#adc6ff] bg-[#10131a] px-1 py-0.5 rounded">C:\Users\Admin\Documents\</code> with file extensions rewritten to <code className="text-[#ffb786]">.enc</code>. Average payload entropy rose from baseline 3.2 to <strong>7.94</strong> (Shannon Entropy threshold &gt; 7.8 indicates strong symmetric encryption cipher like AES-256).
+        <p className="text-[13px] text-[#e1e2ec] leading-relaxed font-mono">
+          {riskData.reason}
         </p>
+        {riskData.timestamp && (
+          <p className="text-[10px] text-[#8c909f] font-mono">
+            Last assessment: {riskData.timestamp}
+          </p>
+        )}
+        <div className="flex items-center gap-2 mt-1">
+          <span className="text-[10px] font-mono text-[#8c909f] bg-[#10131a] px-2 py-0.5 rounded border border-[#424754]">
+            SAFE LAB MODE: ACTIVE
+          </span>
+          <span className="text-[10px] font-mono text-[#8c909f] bg-[#10131a] px-2 py-0.5 rounded border border-[#424754]">
+            INCIDENTS DETECTED: {incidentCount}
+          </span>
+        </div>
       </div>
 
-      {/* Middle 2 Columns: Signals & Timeline Graph vs ML Assessment & Containment */}
+      {/* Middle 2 Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-        {/* Left 7 cols: 3 Detection Signals & Entropy Graph */}
+
+        {/* Left: Triggered Signals */}
         <div className="lg:col-span-7 flex flex-col gap-3">
-          {/* 3 Triggered Signals */}
           <div className="bg-[#1d2027] border border-[#424754] rounded p-3.5 space-y-2.5">
             <div className="font-mono text-[10px] font-bold text-[#e1e2ec] uppercase tracking-wider mb-2">
-              TRIGGERED HEURISTIC SIGNALS (3)
+              TRIGGERED BEHAVIORAL SIGNALS ({riskData.signals.length})
             </div>
 
-            {/* Signal 1 */}
-            <div className="bg-[#10131a] border border-[#ffb4ab]/50 rounded p-3 flex items-start gap-3">
-              <div className="w-7 h-7 rounded bg-[#93000a]/40 border border-[#ffb4ab] flex items-center justify-center text-[#ffb4ab] shrink-0 mt-0.5">
-                <FileWarning className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[13px] text-[#ffb4ab]">
-                    High-Entropy Mass Encryption
-                  </span>
-                  <span className="font-mono text-[10px] text-[#ffb4ab] bg-[#93000a]/30 px-1.5 py-0.5 rounded border border-[#ffb4ab]/30">
-                    CRITICAL
-                  </span>
+            {riskData.signals.length === 0 && (
+              <div className="bg-[#10131a] border border-[#4edea3]/30 rounded p-4 flex items-center gap-3">
+                <div className="w-7 h-7 rounded bg-[#00a572]/20 border border-[#4edea3]/40 flex items-center justify-center text-[#4edea3] shrink-0">
+                  <CheckCircle className="w-4 h-4" />
                 </div>
-                <div className="text-[11px] text-[#c2c6d6] mt-0.5 font-mono">
-                  18 files modified in 3.1s | Average Entropy: 7.94 / 8.00 (AES/ChaCha signature)
+                <div>
+                  <span className="font-bold text-[13px] text-[#4edea3]">
+                    No Behavioral Signals Active
+                  </span>
+                  <div className="text-[11px] text-[#c2c6d6] mt-0.5 font-mono">
+                    System operating within normal parameters.
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Signal 2 */}
-            <div className="bg-[#10131a] border border-[#ffb4ab]/50 rounded p-3 flex items-start gap-3">
-              <div className="w-7 h-7 rounded bg-[#93000a]/40 border border-[#ffb4ab] flex items-center justify-center text-[#ffb4ab] shrink-0 mt-0.5">
-                <Trash2 className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[13px] text-[#ffb4ab]">
-                    Volume Shadow Copy Deletion (Inhibited Recovery)
-                  </span>
-                  <span className="font-mono text-[10px] text-[#ffb4ab] bg-[#93000a]/30 px-1.5 py-0.5 rounded border border-[#ffb4ab]/30">
-                    MITRE T1490
-                  </span>
+            {riskData.signals.map((signal, idx) => {
+              const info = SIGNAL_LABELS[signal] || {
+                label: signal.replace(/_/g, ' ').toUpperCase(),
+                description: `Behavioral signal: ${signal}`,
+              };
+              const isCritical = signal.includes('ml_ransomware_confirmed') || signal.includes('rapid_mass');
+              return (
+                <div
+                  key={idx}
+                  className={`bg-[#10131a] border ${
+                    isCritical ? 'border-[#ffb4ab]/50' : 'border-[#ffb786]/50'
+                  } rounded p-3 flex items-start gap-3`}
+                >
+                  <div className={`w-7 h-7 rounded ${
+                    isCritical
+                      ? 'bg-[#93000a]/40 border border-[#ffb4ab]'
+                      : 'bg-[#df7412]/30 border border-[#ffb786]'
+                  } flex items-center justify-center ${
+                    isCritical ? 'text-[#ffb4ab]' : 'text-[#ffb786]'
+                  } shrink-0 mt-0.5`}>
+                    {signal.includes('ml_') ? (
+                      <Brain className="w-4 h-4" />
+                    ) : (
+                      <FileWarning className="w-4 h-4" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className={`font-bold text-[13px] ${
+                        isCritical ? 'text-[#ffb4ab]' : 'text-[#ffb786]'
+                      }`}>
+                        {info.label}
+                      </span>
+                      <span className={`font-mono text-[10px] ${
+                        isCritical ? 'text-[#ffb4ab] bg-[#93000a]/30' : 'text-[#ffb786] bg-[#df7412]/20'
+                      } px-1.5 py-0.5 rounded border ${
+                        isCritical ? 'border-[#ffb4ab]/30' : 'border-[#ffb786]/30'
+                      }`}>
+                        {isCritical ? 'CRITICAL' : 'HIGH'}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-[#c2c6d6] mt-0.5 font-mono">
+                      {info.description}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-[11px] text-[#c2c6d6] mt-0.5 font-mono">
-                  vssadmin.exe Delete Shadows /All /Quiet executed via hidden cmd.exe instance
-                </div>
-              </div>
-            </div>
-
-            {/* Signal 3 */}
-            <div className="bg-[#10131a] border border-[#ffb786]/50 rounded p-3 flex items-start gap-3">
-              <div className="w-7 h-7 rounded bg-[#df7412]/30 border border-[#ffb786] flex items-center justify-center text-[#ffb786] shrink-0 mt-0.5">
-                <KeyRound className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[13px] text-[#ffb786]">
-                    Honeytoken Decoy Canary Tripped
-                  </span>
-                  <span className="font-mono text-[10px] text-[#ffb786] bg-[#df7412]/20 px-1.5 py-0.5 rounded border border-[#ffb786]/30">
-                    CANARY #4
-                  </span>
-                </div>
-                <div className="text-[11px] text-[#c2c6d6] mt-0.5 font-mono">
-                  Access detected on bait vault: C:\vault\passwords_backup.kdbx
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
 
-          {/* Entropy Spike Chart */}
-          <div className="bg-[#1d2027] border border-[#424754] rounded p-3.5 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <div className="font-mono text-[10px] font-bold text-[#c2c6d6] uppercase tracking-wider">
-                SHANNON ENTROPY TRAJECTORY (THRESHOLD = 7.80)
-              </div>
-              <span className="font-mono text-[10px] text-[#ffb4ab] font-bold">PEAK: 7.95</span>
+          {/* Detection Summary Stats */}
+          <div className="bg-[#1d2027] border border-[#424754] rounded p-3.5">
+            <div className="font-mono text-[10px] font-bold text-[#c2c6d6] uppercase tracking-wider mb-3">
+              SYSTEM TELEMETRY SUMMARY
             </div>
-
-            <div className="w-full h-32 relative bg-[#10131a] rounded border border-[#424754] p-2 flex items-center">
-              {/* Threshold line */}
-              <div className="absolute left-0 right-0 top-[26%] border-b border-dashed border-[#ffb4ab]/60 z-0">
-                <span className="absolute right-2 -top-3 text-[9px] font-mono text-[#ffb4ab]">
-                  7.80 ENCRYPTION THRESHOLD
-                </span>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="bg-[#10131a] rounded border border-[#424754] p-3 text-center">
+                <div className="font-mono text-[18px] font-bold text-[#adc6ff]">
+                  {statusData?.file_event_count || 0}
+                </div>
+                <div className="font-mono text-[9px] text-[#8c909f] uppercase">
+                  File Events
+                </div>
               </div>
-
-              {/* Entropy SVG Graph */}
-              <svg className="w-full h-full relative z-10" preserveAspectRatio="none" viewBox="0 0 300 100">
-                {/* Fill under graph */}
-                <path
-                  d="M 0 85 L 40 82 L 80 84 L 120 80 L 160 78 L 190 75 L 210 30 L 230 18 L 260 16 L 300 15 L 300 100 L 0 100 Z"
-                  fill="url(#entropyGrad)"
-                />
-                {/* Stroke */}
-                <path
-                  d="M 0 85 L 40 82 L 80 84 L 120 80 L 160 78 L 190 75 L 210 30 L 230 18 L 260 16 L 300 15"
-                  fill="none"
-                  stroke="#ffb4ab"
-                  strokeWidth="2.5"
-                />
-                <defs>
-                  <linearGradient id="entropyGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ffb4ab" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#ffb4ab" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <div className="flex justify-between font-mono text-[9px] text-[#8c909f] mt-1.5">
-              <span>T-60s (Baseline 3.20)</span>
-              <span>T-30s</span>
-              <span>T-15s (Spike start)</span>
-              <span className="text-[#ffb4ab] font-bold">Now (7.94 Critical)</span>
+              <div className="bg-[#10131a] rounded border border-[#424754] p-3 text-center">
+                <div className="font-mono text-[18px] font-bold text-[#adc6ff]">
+                  {statusData?.network_event_count || 0}
+                </div>
+                <div className="font-mono text-[9px] text-[#8c909f] uppercase">
+                  Network Events
+                </div>
+              </div>
+              <div className="bg-[#10131a] rounded border border-[#424754] p-3 text-center">
+                <div className="font-mono text-[18px] font-bold text-[#adc6ff]">
+                  {statusData?.process_event_count || 0}
+                </div>
+                <div className="font-mono text-[9px] text-[#8c909f] uppercase">
+                  Process Events
+                </div>
+              </div>
+              <div className="bg-[#10131a] rounded border border-[#424754] p-3 text-center">
+                <div className={`font-mono text-[18px] font-bold ${
+                  incidentCount > 0 ? 'text-[#ffb4ab]' : 'text-[#4edea3]'
+                }`}>
+                  {incidentCount}
+                </div>
+                <div className="font-mono text-[9px] text-[#8c909f] uppercase">
+                  Incidents
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Right 5 cols: ML Confidence & Response Playbook */}
+        {/* Right: ML Confidence & Response Info */}
         <div className="lg:col-span-5 flex flex-col gap-3">
+
           {/* ML Assessment Card */}
           <div className="bg-[#1d2027] border border-[#424754] rounded p-4 flex flex-col justify-between">
             <div className="flex items-center justify-between border-b border-[#424754] pb-2">
               <span className="font-mono text-[10px] font-bold text-[#e1e2ec] uppercase">
                 ML CLASSIFIER ASSESSMENT
               </span>
-              <span className="font-mono text-[9px] text-[#4edea3] bg-[#00a572]/20 px-2 py-0.5 rounded border border-[#4edea3]/30">
-                HIGH CONFIDENCE
+              <span className={`font-mono text-[9px] px-2 py-0.5 rounded border ${
+                mlConfidence > 70
+                  ? 'text-[#ffb4ab] bg-[#93000a]/20 border-[#ffb4ab]/30'
+                  : mlConfidence > 0
+                    ? 'text-[#e5c349] bg-[#625b00]/20 border-[#e5c349]/30'
+                    : 'text-[#4edea3] bg-[#00a572]/20 border-[#4edea3]/30'
+              }`}>
+                {mlConfidence > 70
+                  ? 'HIGH CONFIDENCE'
+                  : mlConfidence > 0
+                    ? 'LOW CONFIDENCE'
+                    : 'NORMAL'}
               </span>
             </div>
 
-            <div className="flex items-center justify-around my-3">
+            <div className="flex items-center justify-around my-4">
               <div className="relative w-24 h-24 flex items-center justify-center">
                 <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
                   <path
@@ -248,17 +411,21 @@ export const DetectionRiskView: React.FC = () => {
                     strokeWidth="3.5"
                   />
                   <path
-                    className="text-[#ffb4ab] stroke-current transition-all duration-1000"
+                    className={`${
+                      mlConfidence > 70 ? 'text-[#ffb4ab]' : 'text-[#4edea3]'
+                    } stroke-current transition-all duration-1000`}
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
-                    strokeDasharray="99.64, 100"
+                    strokeDasharray={`${mlConfidence}, 100`}
                     strokeLinecap="round"
                     strokeWidth="3.5"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center flex-col">
-                  <span className="font-mono text-[18px] font-bold text-[#ffb4ab] leading-none">
-                    99.64%
+                  <span className={`font-mono text-[18px] font-bold ${
+                    mlConfidence > 70 ? 'text-[#ffb4ab]' : 'text-[#4edea3]'
+                  } leading-none`}>
+                    {mlConfidence.toFixed(1)}%
                   </span>
                   <span className="font-mono text-[8px] text-[#c2c6d6] uppercase mt-0.5">
                     LIKELIHOOD
@@ -267,70 +434,103 @@ export const DetectionRiskView: React.FC = () => {
               </div>
 
               <div className="space-y-1.5 font-mono text-[10px]">
-                <div className="text-[#8c909f]">Family: <span className="text-[#e1e2ec] font-bold">LockBit / BlackCat Variant</span></div>
-                <div className="text-[#8c909f]">Target: <span className="text-[#e1e2ec]">User Documents</span></div>
-                <div className="text-[#8c909f]">False Positive: <span className="text-[#4edea3]">&lt; 0.001%</span></div>
+                <div className="text-[#8c909f]">
+                  Model: <span className="text-[#e1e2ec] font-bold">Random Forest v2.0.0</span>
+                </div>
+                <div className="text-[#8c909f]">
+                  Threshold: <span className="text-[#e1e2ec]">70% (0.7)</span>
+                </div>
+                <div className="text-[#8c909f]">
+                  Classification:{' '}
+                  <span className={mlConfidence > 70 ? 'text-[#ffb4ab] font-bold' : 'text-[#4edea3]'}>
+                    {mlConfidence > 70 ? 'RANSOMWARE_LIKE' : 'NORMAL'}
+                  </span>
+                </div>
+                <div className="text-[#8c909f]">
+                  ML Contributed:{' '}
+                  <span className="text-[#e1e2ec]">
+                    {riskData.ml_contributed ? 'Yes' : 'No'}
+                  </span>
+                </div>
               </div>
+            </div>
+
+            <div className="text-[10px] font-mono text-[#8c909f] border-t border-[#424754] pt-2 mt-1">
+              ML is advisory only. ML alone caps at MEDIUM severity.
+              Rule HIGH + ML confident agreement = CRITICAL.
             </div>
           </div>
 
-          {/* Containment Execution Plan */}
+          {/* Response & Protection Status */}
           <div className="bg-[#1d2027] border border-[#424754] rounded p-4 flex flex-col flex-1">
             <div className="font-mono text-[10px] font-bold text-[#e1e2ec] uppercase tracking-wider mb-3">
-              RECOMMENDED CONTAINMENT ACTION
+              RESPONSE & PROTECTION STATUS
             </div>
 
             <div className="space-y-2 flex-1 font-mono text-[11px]">
-              <label className="flex items-center gap-2 p-2 bg-[#10131a] rounded border border-[#424754] cursor-pointer hover:bg-[#272a31]">
-                <input
-                  type="checkbox"
-                  checked={selectedPlanItems.isolate}
-                  onChange={(e) => setSelectedPlanItems({ ...selectedPlanItems, isolate: e.target.checked })}
-                  className="rounded accent-[#adc6ff]"
-                />
-                <span className="text-[#e1e2ec]">1. Network Quarantine (Block all ports except SOC)</span>
-              </label>
+              <div className="flex items-center gap-2 p-2.5 bg-[#10131a] rounded border border-[#424754]">
+                <Eye className="w-4 h-4 text-[#adc6ff]" />
+                <div className="flex-1">
+                  <div className="text-[#e1e2ec] font-bold">Response Decision</div>
+                  <div className="text-[#8c909f] text-[10px]">
+                    {isActive
+                      ? riskLevel === 'CRITICAL'
+                        ? 'CRITICAL_RESPONSE_RESERVED'
+                        : 'CONTAINMENT_RECOMMENDED'
+                      : 'NO_ACTION'}
+                  </div>
+                </div>
+              </div>
 
-              <label className="flex items-center gap-2 p-2 bg-[#10131a] rounded border border-[#424754] cursor-pointer hover:bg-[#272a31]">
-                <input
-                  type="checkbox"
-                  checked={selectedPlanItems.killTree}
-                  onChange={(e) => setSelectedPlanItems({ ...selectedPlanItems, killTree: e.target.checked })}
-                  className="rounded accent-[#adc6ff]"
-                />
-                <span className="text-[#e1e2ec]">2. Terminate Process Tree (PID 8842, 8934)</span>
-              </label>
+              <div className="flex items-center gap-2 p-2.5 bg-[#10131a] rounded border border-[#424754]">
+                <ShieldAlert className="w-4 h-4 text-[#adc6ff]" />
+                <div className="flex-1">
+                  <div className="text-[#e1e2ec] font-bold">Protection Action</div>
+                  <div className="text-[#8c909f] text-[10px]">
+                    {isActive
+                      ? riskLevel === 'CRITICAL'
+                        ? 'CRITICAL_PROTECTION_RESERVED'
+                        : 'LAB_CONTAINMENT_RECOMMENDED'
+                      : 'NO_PROTECTION'}
+                  </div>
+                </div>
+              </div>
 
-              <label className="flex items-center gap-2 p-2 bg-[#10131a] rounded border border-[#424754] cursor-pointer hover:bg-[#272a31]">
-                <input
-                  type="checkbox"
-                  checked={selectedPlanItems.restoreShadow}
-                  onChange={(e) => setSelectedPlanItems({ ...selectedPlanItems, restoreShadow: e.target.checked })}
-                  className="rounded accent-[#adc6ff]"
-                />
-                <span className="text-[#e1e2ec]">3. Restore Snapshot from 14:20:00 UTC</span>
-              </label>
+              <div className="flex items-center gap-2 p-2.5 bg-[#10131a] rounded border border-[#424754]">
+                <Shield className="w-4 h-4 text-[#4edea3]" />
+                <div className="flex-1">
+                  <div className="text-[#e1e2ec] font-bold">Protection Mode</div>
+                  <div className="text-[#4edea3] text-[10px] font-bold">
+                    DRY_RUN — No destructive actions executed
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 p-2.5 bg-[#10131a] rounded border border-[#424754]">
+                <Zap className="w-4 h-4 text-[#e5c349]" />
+                <div className="flex-1">
+                  <div className="text-[#e1e2ec] font-bold">Safe Lab Mode</div>
+                  <div className="text-[#4edea3] text-[10px]">
+                    ACTIVE — Academic lab environment
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <button
-              onClick={handleAuthorize}
-              disabled={systemStatus.hostIsolated}
-              className={`w-full mt-4 font-mono text-[12px] font-bold py-2.5 rounded shadow flex items-center justify-center gap-2 transition-all ${
-                systemStatus.hostIsolated
-                  ? 'bg-[#00a572]/20 border border-[#4edea3] text-[#4edea3] cursor-default'
-                  : 'bg-[#ffb4ab] text-[#690005] hover:bg-white'
-              }`}
-            >
-              {systemStatus.hostIsolated ? (
-                <>
-                  <Check className="w-4 h-4" /> CONTAINMENT EXECUTED
-                </>
-              ) : (
-                <>
-                  <Zap className="w-4 h-4" /> EXECUTE CONTAINMENT SEQUENCE
-                </>
-              )}
-            </button>
+            {isActive && !systemStatus.hostIsolated && (
+              <button
+                onClick={handleAuthorize}
+                className="w-full mt-4 font-mono text-[12px] font-bold py-2.5 rounded shadow flex items-center justify-center gap-2 transition-all bg-[#ffb4ab] text-[#690005] hover:bg-white"
+              >
+                <Lock className="w-4 h-4" /> AUTHORIZE CONTAINMENT (DRY-RUN)
+              </button>
+            )}
+
+            {systemStatus.hostIsolated && (
+              <div className="w-full mt-4 font-mono text-[12px] font-bold py-2.5 rounded shadow flex items-center justify-center gap-2 bg-[#00a572]/20 border border-[#4edea3] text-[#4edea3]">
+                <CheckCircle className="w-4 h-4" /> CONTAINMENT ACKNOWLEDGED (DRY-RUN)
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -338,17 +538,20 @@ export const DetectionRiskView: React.FC = () => {
       {/* Bottom Action Log Terminal */}
       <div className="bg-[#0b0e15] border border-[#424754] rounded p-3 font-mono text-[11px] space-y-1 overflow-y-auto max-h-36">
         <div className="text-[#8c909f] text-[9px] uppercase font-bold border-b border-[#424754]/50 pb-1 mb-1">
-          Real-Time Audit Log &amp; Automated Responses
+          Audit Log &amp; Response Actions (DRY-RUN)
         </div>
+        {actionLogs.length === 0 && (
+          <div className="text-[#8c909f]">No actions recorded this session.</div>
+        )}
         {actionLogs.map((log, idx) => (
           <div
             key={idx}
             className={
-              log.includes('CONTAINMENT') || log.includes('PROCESS KILL')
+              log.includes('CONTAINMENT')
                 ? 'text-[#4edea3] font-bold'
                 : log.includes('CRITICAL') || log.includes('RANSOMWARE')
-                ? 'text-[#ffb4ab]'
-                : 'text-[#c2c6d6]'
+                  ? 'text-[#ffb4ab]'
+                  : 'text-[#c2c6d6]'
             }
           >
             {log}
