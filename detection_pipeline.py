@@ -386,19 +386,71 @@ def evaluate_current_window():
             containment_result
         )
 
+        # --------------------------------------------------
+        # INCIDENT MANAGEMENT
+        # --------------------------------------------------
+        from core.incident_manager import incident_manager
+
+        risk_level = risk_result["risk_level"]
+        ml_signal = risk_result.get("ml_signal")
+        ml_prob = (
+            ml_signal.get("probability", 0.0)
+            if ml_signal else 0.0
+        )
+
+        if risk_level not in ("NORMAL", "LOW"):
+            # Check if there's already an active incident
+            active = incident_manager.get_active_incident()
+
+            if active is None:
+                # Create a new incident
+                incident_manager.create_incident(
+                    risk_level=risk_level,
+                    reason=risk_result["reason"],
+                    signals=risk_result["signals"],
+                    ml_probability=ml_prob,
+                    ml_contributed=risk_result.get(
+                        "ml_contributed", False
+                    ),
+                    file_count=features.get(
+                        "unique_files_modified", 0
+                    ),
+                    network_count=features.get(
+                        "network_events", 0
+                    ),
+                )
+            else:
+                # Update existing incident risk
+                incident_manager.update_risk(
+                    active["incident_id"],
+                    risk_level=risk_level,
+                    reason=risk_result["reason"],
+                    signals=risk_result["signals"],
+                    ml_probability=ml_prob,
+                )
+        else:
+            # Risk returned to NORMAL/LOW — clear active
+            active = incident_manager.get_active_incident()
+            if active:
+                incident_manager.add_timeline_event(
+                    active["incident_id"],
+                    "risk_cleared",
+                    "Behavioral risk returned to NORMAL.",
+                )
+                incident_manager.clear_active()
+
         # Update current incident state
         _current_incident_signature = new_signature
 
-        if risk_result["risk_level"] != "NORMAL":
+        if risk_level not in ("NORMAL", "LOW"):
             print(
                 "\n[INCIDENT] NEW state transition → "
-                f"{risk_result['risk_level']}"
+                f"{risk_level}"
             )
         else:
-            if _current_incident_signature is not None:
-                print(
-                    "\n[INCIDENT] State recovered → NORMAL"
-                )
+            print(
+                "\n[INCIDENT] State recovered → NORMAL"
+            )
 
     return (
         recent_events,

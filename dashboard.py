@@ -1,4 +1,4 @@
-from flask import Flask, Response, jsonify, render_template_string
+from flask import Flask, Response, jsonify, render_template_string, request
 from flask_cors import CORS
 import json
 import os
@@ -466,6 +466,10 @@ def api_status():
 
     risk = calculate_risk(events)
 
+    # Get active incident info
+    from core.incident_manager import incident_manager
+    active = incident_manager.get_active_incident()
+
     return jsonify({
 
         "status": "ONLINE",
@@ -498,6 +502,20 @@ def api_status():
 
         "risk_signals":
             risk.get("signals", []),
+
+        "active_incident_id":
+            active["incident_id"] if active else None,
+
+        "active_incident_status":
+            active["status"] if active else None,
+
+        "ml_probability":
+            active.get("ml_probability", 0.0) if active else 0.0,
+
+        "ml_classification":
+            "RANSOMWARE_LIKE"
+            if active and active.get("ml_probability", 0) > 0.7
+            else "NORMAL",
 
         "timestamp":
             datetime.now().isoformat(
@@ -694,7 +712,220 @@ def api_risk():
         events
     )
 
-    return jsonify(risk)
+    # Enrich with incident and ML data
+    from core.incident_manager import incident_manager
+    active = incident_manager.get_active_incident()
+
+    result = dict(risk)
+    if active:
+        result["incident_id"] = active["incident_id"]
+        result["ml"] = {
+            "classification": "RANSOMWARE_LIKE"
+            if active.get("ml_probability", 0) > 0.7
+            else "NORMAL",
+            "probability": active.get("ml_probability", 0),
+            "threshold": 0.7,
+            "contributed": active.get("ml_contributed", False),
+        }
+    else:
+        result["incident_id"] = None
+        result["ml"] = {
+            "classification": "NORMAL",
+            "probability": 0.0,
+            "threshold": 0.7,
+            "contributed": False,
+        }
+
+    return jsonify(result)
+
+
+# ============================================================
+# INCIDENTS API
+# ============================================================
+
+@app.route("/api/incidents")
+def api_incidents():
+    """Return all incidents."""
+    from core.incident_manager import incident_manager
+    incidents = incident_manager.get_all_incidents()
+    active = incident_manager.get_active_incident()
+    return jsonify({
+        "incidents": incidents,
+        "active_incident_id": active["incident_id"] if active else None,
+        "count": len(incidents),
+    })
+
+
+@app.route("/api/incidents/<incident_id>")
+def api_incident_detail(incident_id):
+    """Return a specific incident."""
+    from core.incident_manager import incident_manager
+    inc = incident_manager.get_incident(incident_id)
+    if not inc:
+        return jsonify({"error": "Incident not found"}), 404
+    return jsonify(inc)
+
+
+@app.route("/api/incidents/<incident_id>/acknowledge", methods=["POST"])
+def api_incident_acknowledge(incident_id):
+    """Acknowledge an incident → INVESTIGATING."""
+    from core.incident_manager import incident_manager
+    from core.prevention_engine import _log_audit
+    inc = incident_manager.acknowledge(incident_id)
+    if not inc:
+        return jsonify({"error": "Incident not found"}), 404
+    _log_audit("incident_acknowledged", f"Incident {incident_id} acknowledged.", incident_id)
+    return jsonify({"success": True, "incident": inc, "mode": "DRY_RUN"})
+
+
+@app.route("/api/incidents/<incident_id>/contain", methods=["POST"])
+def api_incident_contain(incident_id):
+    """Trigger containment for an incident."""
+    from core.prevention_engine import trigger_containment
+    result = trigger_containment(incident_id)
+    return jsonify(result)
+
+
+@app.route("/api/incidents/<incident_id>/resolve", methods=["POST"])
+def api_incident_resolve(incident_id):
+    """Resolve an incident."""
+    from core.incident_manager import incident_manager
+    from core.prevention_engine import _log_audit
+    inc = incident_manager.resolve(incident_id)
+    if not inc:
+        return jsonify({"error": "Incident not found"}), 404
+    _log_audit("incident_resolved", f"Incident {incident_id} resolved.", incident_id)
+    return jsonify({"success": True, "incident": inc, "mode": "DRY_RUN"})
+
+
+@app.route("/api/incidents/<incident_id>/close", methods=["POST"])
+def api_incident_close(incident_id):
+    """Close an incident."""
+    from core.incident_manager import incident_manager
+    from core.prevention_engine import _log_audit
+    inc = incident_manager.close(incident_id)
+    if not inc:
+        return jsonify({"error": "Incident not found"}), 404
+    _log_audit("incident_closed", f"Incident {incident_id} closed.", incident_id)
+    return jsonify({"success": True, "incident": inc, "mode": "DRY_RUN"})
+
+
+# ============================================================
+# PREVENTION API
+# ============================================================
+
+@app.route("/api/prevention/protect", methods=["POST"])
+def api_prevention_protect():
+    """Protect lab files (create snapshot)."""
+    from core.incident_manager import incident_manager
+    from core.prevention_engine import protect_lab_files
+    active = incident_manager.get_active_incident()
+    incident_id = active["incident_id"] if active else None
+    result = protect_lab_files(incident_id)
+    return jsonify(result)
+
+
+@app.route("/api/prevention/isolate-process", methods=["POST"])
+def api_prevention_isolate_process():
+    """Simulate process isolation."""
+    from core.incident_manager import incident_manager
+    from core.prevention_engine import simulate_process_isolation
+
+    data = request.get_json(silent=True) or {}
+    pid = data.get("pid")
+    process_name = data.get("process")
+    active = incident_manager.get_active_incident()
+    incident_id = active["incident_id"] if active else None
+
+    result = simulate_process_isolation(
+        pid=pid,
+        process_name=process_name,
+        incident_id=incident_id,
+    )
+    return jsonify(result)
+
+
+@app.route("/api/prevention/isolate-network", methods=["POST"])
+def api_prevention_isolate_network():
+    """Simulate network isolation."""
+    from core.incident_manager import incident_manager
+    from core.prevention_engine import simulate_network_isolation
+
+    data = request.get_json(silent=True) or {}
+    target = data.get("target")
+    active = incident_manager.get_active_incident()
+    incident_id = active["incident_id"] if active else None
+
+    result = simulate_network_isolation(
+        incident_id=incident_id,
+        target=target,
+    )
+    return jsonify(result)
+
+
+# ============================================================
+# RECOVERY API
+# ============================================================
+
+@app.route("/api/recovery/snapshot", methods=["POST"])
+def api_recovery_snapshot():
+    """Create a recovery snapshot."""
+    from core.incident_manager import incident_manager
+    from core.prevention_engine import create_recovery_snapshot
+    active = incident_manager.get_active_incident()
+    incident_id = active["incident_id"] if active else None
+    result = create_recovery_snapshot(incident_id)
+    return jsonify(result)
+
+
+@app.route("/api/recovery/restore", methods=["POST"])
+def api_recovery_restore():
+    """Restore lab files from snapshot."""
+    from core.incident_manager import incident_manager
+    from core.prevention_engine import restore_lab_files
+    active = incident_manager.get_active_incident()
+    incident_id = active["incident_id"] if active else None
+    result = restore_lab_files(incident_id)
+    return jsonify(result)
+
+
+# ============================================================
+# SIMULATION API
+# ============================================================
+
+@app.route("/api/simulation/run", methods=["POST"])
+def api_simulation_run():
+    """Run the safe ransomware behavior simulator."""
+    from core.prevention_engine import run_safe_simulation
+    result = run_safe_simulation()
+    return jsonify(result)
+
+
+# ============================================================
+# AUDIT API
+# ============================================================
+
+@app.route("/api/audit")
+def api_audit():
+    """Return the audit log."""
+    from core.prevention_engine import get_audit_log
+    audit = get_audit_log()
+    return jsonify({
+        "entries": audit,
+        "count": len(audit),
+    })
+
+
+# ============================================================
+# HEALTH API
+# ============================================================
+
+@app.route("/api/health")
+def api_health():
+    """Return real system health."""
+    from core.prevention_engine import get_system_health
+    health = get_system_health()
+    return jsonify(health)
 
 
 # ============================================================

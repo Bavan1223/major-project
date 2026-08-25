@@ -7,6 +7,8 @@ VALID_SOURCES = {
     "network_monitor",
     "honeypot",
     "detection_engine",
+    "incident_manager",
+    "prevention_engine",
     "test"
 }
 
