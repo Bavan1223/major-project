@@ -50,6 +50,7 @@ export const Sidebar: React.FC = () => {
       badgeColor: 'bg-[#93000a] text-[#ffdad6]',
     },
     { id: 'response', label: 'Response', icon: ShieldCheck },
+    { id: 'prevention', label: 'Prevention', icon: Shield },
     { id: 'system-health', label: 'System Health', icon: Activity },
   ];
 

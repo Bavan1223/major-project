@@ -9,6 +9,7 @@ import { ProcessActivityView } from './components/views/ProcessActivityView';
 import { DetectionRiskView } from './components/views/DetectionRiskView';
 import { FileActivityView } from './components/views/FileActivityView';
 import { ResponseView } from './components/views/ResponseView';
+import { PreventionView } from './components/views/PreventionView';
 import { SystemHealthView } from './components/views/SystemHealthView';
 
 const MainContent: React.FC = () => {
@@ -23,6 +24,7 @@ const MainContent: React.FC = () => {
       {activeTab === 'process-activity' && <ProcessActivityView />}
       {activeTab === 'detection-risk' && <DetectionRiskView />}
       {activeTab === 'response' && <ResponseView />}
+      {activeTab === 'prevention' && <PreventionView />}
       {activeTab === 'system-health' && <SystemHealthView />}
     </main>
   );
