@@ -1,6 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { useSoc } from '../../context/SocContext';
-import { NetworkConnection } from '../../types';
+import {
+  NetworkConnection,
+} from '../../types';
+
 import {
   Network,
   Search,
@@ -9,177 +12,236 @@ import {
   Repeat,
   Terminal,
   AlertTriangle,
-  ShieldAlert,
 } from 'lucide-react';
 
+
 export const NetworkActivityView: React.FC = () => {
+
   const {
     connections,
-    setSelectedProcess,
     processes,
+    setSelectedProcess,
     setActiveTab,
   } = useSoc();
+
 
   const [filterText, setFilterText] =
     useState('');
 
   const [selectedStatusFilter, setSelectedStatusFilter] =
-    useState<string>('ALL');
+    useState('ALL');
 
   const [selectedConnection, setSelectedConnection] =
     useState<NetworkConnection | null>(null);
+
 
   /*
    * ==========================================================
    * REAL NETWORK TELEMETRY
    * ==========================================================
    *
-   * The connections array is populated from:
+   * connections comes from:
    *
    *     GET /api/network
    *
-   * Do not use hardcoded/demo network statistics here.
+   * No hardcoded network statistics.
    */
 
+
   const establishedConnections =
-    useMemo(
-      () =>
-        connections.filter(
-          (conn) =>
-            conn.status === 'ESTABLISHED' ||
-            conn.status === 'ESTAB'
-        ),
-      [connections]
-    );
+    useMemo(() => {
+
+      return connections.filter(
+        (connection) =>
+          connection.status === 'ESTABLISHED' ||
+          connection.status === 'ESTAB'
+      );
+
+    }, [connections]);
+
 
   const uniqueRemoteIPs =
     useMemo(() => {
-      const ips = new Set<string>();
 
-      connections.forEach((conn) => {
-        const address =
-          conn.remoteAddress || '';
+      const ips =
+        new Set<string>();
 
-        const ip =
-          address.includes(':')
-            ? address.substring(
-                0,
-                address.lastIndexOf(':')
-              )
-            : address;
+      connections.forEach(
+        (connection) => {
 
-        if (
-          ip &&
-          ip !== 'Unknown' &&
-          ip !== '*'
-        ) {
-          ips.add(ip);
+          const address =
+            connection.remoteAddress || '';
+
+          if (!address) {
+            return;
+          }
+
+          /*
+           * IPv4:port
+           */
+          const lastColon =
+            address.lastIndexOf(':');
+
+          const ip =
+            lastColon > -1
+              ? address.substring(
+                  0,
+                  lastColon
+                )
+              : address;
+
+          if (
+            ip &&
+            ip !== 'Unknown' &&
+            ip !== '*'
+          ) {
+            ips.add(ip);
+          }
+
         }
-      });
+      );
 
       return ips.size;
+
     }, [connections]);
 
+
   const repeatedConnections =
-    useMemo(
-      () =>
-        connections.filter(
-          (conn) =>
-            conn.indicator ===
+    useMemo(() => {
+
+      return connections.filter(
+        (connection) =>
+          connection.indicator ===
             'repeated_connection_to_endpoint' ||
-            conn.indicator ===
+          connection.indicator ===
             'repeated_connection'
-        ),
-      [connections]
-    );
+      );
+
+    }, [connections]);
+
+
+  /*
+   * ==========================================================
+   * FILTERING
+   * ==========================================================
+   */
 
   const filteredConnections =
     useMemo(() => {
 
       return connections.filter(
-        (conn) => {
+        (connection) => {
 
-          /*
-           * Convert the real backend indicator
-           * into the filter categories used by
-           * the UI.
-           */
+          const indicator =
+            (
+              connection.indicator ||
+              ''
+            ).toLowerCase();
+
 
           const isRepeated =
-            conn.indicator ===
+            indicator ===
               'repeated_connection_to_endpoint' ||
-            conn.indicator ===
+            indicator ===
               'repeated_connection';
 
-          const isSuspicious =
-            isRepeated;
 
-          const isAnomaly =
-            conn.indicator !==
-              'new_established_connection' &&
-            !isRepeated;
+          const isNormal =
+            indicator ===
+            'new_established_connection';
+
 
           if (
             selectedStatusFilter ===
             'SUSPICIOUS' &&
-            !isSuspicious
+            !isRepeated
           ) {
             return false;
           }
 
-          if (
-            selectedStatusFilter ===
-            'ANOMALY' &&
-            !isAnomaly
-          ) {
-            return false;
-          }
 
           if (
             selectedStatusFilter ===
             'NORMAL' &&
-            (isSuspicious || isAnomaly)
+            !isNormal
           ) {
             return false;
           }
 
+
           if (
-            filterText.trim() !== ''
+            selectedStatusFilter ===
+            'ANOMALY' &&
+            isNormal
           ) {
-
-            const q =
-              filterText
-                .toLowerCase()
-                .trim();
-
-            return (
-              (conn.process || '')
-                .toLowerCase()
-                .includes(q) ||
-
-              (conn.localAddress || '')
-                .toLowerCase()
-                .includes(q) ||
-
-              (conn.remoteAddress || '')
-                .toLowerCase()
-                .includes(q) ||
-
-              String(
-                conn.pid ?? ''
-              ).includes(q) ||
-
-              (conn.status || '')
-                .toLowerCase()
-                .includes(q) ||
-
-              (conn.indicator || '')
-                .toLowerCase()
-                .includes(q)
-            );
+            return false;
           }
 
-          return true;
+
+          const query =
+            filterText
+              .trim()
+              .toLowerCase();
+
+
+          if (!query) {
+            return true;
+          }
+
+
+          return (
+
+            (
+              connection.process ||
+              ''
+            )
+              .toLowerCase()
+              .includes(query)
+
+            ||
+
+            (
+              connection.localAddress ||
+              ''
+            )
+              .toLowerCase()
+              .includes(query)
+
+            ||
+
+            (
+              connection.remoteAddress ||
+              ''
+            )
+              .toLowerCase()
+              .includes(query)
+
+            ||
+
+            String(
+              connection.pid ?? ''
+            ).includes(query)
+
+            ||
+
+            (
+              connection.status ||
+              ''
+            )
+              .toLowerCase()
+              .includes(query)
+
+            ||
+
+            (
+              connection.indicator ||
+              ''
+            )
+              .toLowerCase()
+              .includes(query)
+
+          );
+
         }
       );
 
@@ -189,14 +251,35 @@ export const NetworkActivityView: React.FC = () => {
       selectedStatusFilter,
     ]);
 
+
   /*
    * ==========================================================
-   * UI
+   * CONNECTION CLICK
+   * ==========================================================
+   */
+
+  const inspectConnection =
+    (
+      connection: NetworkConnection
+    ) => {
+
+      setSelectedConnection(
+        connection
+      );
+
+    };
+
+
+  /*
+   * ==========================================================
+   * RENDER
    * ==========================================================
    */
 
   return (
-    <div className="flex flex-col w-full p-4 gap-3 bg-[#10131a] min-h-[calc(100vh-64px)] select-none">
+
+    <div className="flex flex-col w-full p-4 gap-3 bg-[#10131a] min-h-[calc(100vh-64px)]">
+
 
       {/* ======================================================
           REAL NETWORK STATISTICS
@@ -204,20 +287,19 @@ export const NetworkActivityView: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 
-        {/* ESTABLISHED */}
 
-        <div className="bg-[#1d2027] rounded p-4 border border-[#424754] relative overflow-hidden">
+        {/* ESTABLISHED CONNECTIONS */}
 
-          <div className="absolute right-0 top-0 w-32 h-32 bg-[#adc6ff]/5 rounded-full blur-2xl -mr-16 -mt-16" />
+        <div className="bg-[#1d2027] rounded p-4 border border-[#424754]">
 
-          <div className="flex justify-between items-start mb-2">
+          <div className="flex items-center justify-between mb-3">
 
-            <div className="flex items-center gap-1.5 text-[#c2c6d6]">
+            <div className="flex items-center gap-2">
 
               <ArrowUpDown className="w-4 h-4 text-[#adc6ff]" />
 
-              <span className="font-mono text-[10px] font-bold tracking-wider uppercase">
-                ESTABLISHED CONNECTIONS
+              <span className="font-mono text-[10px] font-bold text-[#c2c6d6] uppercase tracking-wider">
+                Established Connections
               </span>
 
             </div>
@@ -228,49 +310,34 @@ export const NetworkActivityView: React.FC = () => {
 
           </div>
 
+
           <div className="flex items-end gap-2">
 
-            <span className="text-[26px] font-bold text-[#e1e2ec] font-mono leading-none">
+            <span className="text-[28px] font-bold font-mono text-[#e1e2ec]">
               {establishedConnections.length}
             </span>
 
-            <span className="font-mono text-[11px] text-[#c2c6d6] mb-0.5">
+            <span className="text-[10px] font-mono text-[#8c909f] mb-1">
               observed
             </span>
-
-          </div>
-
-          <div className="mt-4 h-1.5 w-full bg-[#272a31] rounded-full overflow-hidden">
-
-            <div
-              className="h-full bg-[#adc6ff] rounded-full transition-all"
-              style={{
-                width:
-                  establishedConnections.length > 0
-                    ? '100%'
-                    : '0%',
-              }}
-            />
 
           </div>
 
         </div>
 
 
-        {/* UNIQUE REMOTE IPs */}
+        {/* UNIQUE REMOTE IPS */}
 
-        <div className="bg-[#1d2027] rounded p-4 border border-[#424754] relative overflow-hidden">
+        <div className="bg-[#1d2027] rounded p-4 border border-[#424754]">
 
-          <div className="absolute right-0 top-0 w-32 h-32 bg-[#4edea3]/5 rounded-full blur-2xl -mr-16 -mt-16" />
+          <div className="flex items-center justify-between mb-3">
 
-          <div className="flex justify-between items-start mb-2">
-
-            <div className="flex items-center gap-1.5 text-[#c2c6d6]">
+            <div className="flex items-center gap-2">
 
               <Globe className="w-4 h-4 text-[#4edea3]" />
 
-              <span className="font-mono text-[10px] font-bold tracking-wider uppercase">
-                UNIQUE REMOTE IPs
+              <span className="font-mono text-[10px] font-bold text-[#c2c6d6] uppercase tracking-wider">
+                Unique Remote IPs
               </span>
 
             </div>
@@ -281,82 +348,34 @@ export const NetworkActivityView: React.FC = () => {
 
           </div>
 
+
           <div className="flex items-end gap-2">
 
-            <span className="text-[26px] font-bold text-[#e1e2ec] font-mono leading-none">
+            <span className="text-[28px] font-bold font-mono text-[#e1e2ec]">
               {uniqueRemoteIPs}
             </span>
 
-            <span className="font-mono text-[11px] text-[#c2c6d6] mb-0.5">
+            <span className="text-[10px] font-mono text-[#8c909f] mb-1">
               observed
             </span>
-
-          </div>
-
-          <div className="mt-4 flex gap-1 h-7 items-end">
-
-            {connections.length === 0 ? (
-
-              <div className="w-full h-[20%] bg-[#4edea3]/20 rounded" />
-
-            ) : (
-
-              Array.from(
-                { length: 8 },
-                (_, index) => {
-
-                  const height =
-                    Math.min(
-                      100,
-                      Math.max(
-                        15,
-                        Math.round(
-                          (
-                            connections.length /
-                            Math.max(
-                              1,
-                              connections.length
-                            )
-                          ) *
-                            (25 + index * 9)
-                        )
-                      )
-                    );
-
-                  return (
-                    <div
-                      key={index}
-                      className="w-full bg-[#4edea3]/60 rounded"
-                      style={{
-                        height: `${height}%`,
-                      }}
-                    />
-                  );
-
-                }
-              )
-
-            )}
 
           </div>
 
         </div>
 
 
-        {/* REPEATED */}
+        {/* REPEATED CONNECTIONS */}
 
-        <div className="bg-[#1d2027] rounded p-4 border border-[#424754] relative overflow-hidden">
+        <div className="bg-[#1d2027] rounded p-4 border border-[#424754]">
 
-          <div className="absolute right-0 top-0 w-32 h-32 bg-[#ffb4ab]/5 rounded-full blur-2xl -mr-16 -mt-16" />
+          <div className="flex items-center justify-between mb-3">
 
-          <div className="flex justify-between items-start mb-2">
-
-            <div className="flex items-center gap-1.5 text-[#c2c6d6]">
+            <div className="flex items-center gap-2">
 
               <Repeat className="w-4 h-4 text-[#ffb4ab]" />
 
-              <span className="font-mono text-[10px] font-bold tracking-wider uppercase">
-                REPEATED CONNECTIONS
+              <span className="font-mono text-[10px] font-bold text-[#c2c6d6] uppercase tracking-wider">
+                Repeated Connections
               </span>
 
             </div>
@@ -367,41 +386,16 @@ export const NetworkActivityView: React.FC = () => {
 
           </div>
 
+
           <div className="flex items-end gap-2">
 
-            <span className="text-[26px] font-bold text-[#e1e2ec] font-mono leading-none">
+            <span className="text-[28px] font-bold font-mono text-[#e1e2ec]">
               {repeatedConnections.length}
             </span>
 
-            <span className="font-mono text-[11px] text-[#c2c6d6] mb-0.5">
+            <span className="text-[10px] font-mono text-[#8c909f] mb-1">
               observed
             </span>
-
-          </div>
-
-          <div className="mt-4 relative h-7 w-full">
-
-            <svg
-              className="absolute inset-0 w-full h-full"
-              preserveAspectRatio="none"
-              viewBox="0 0 100 20"
-            >
-
-              <path
-                className="text-[#ffb4ab]/20"
-                d="M0,15 Q10,5 20,10 T40,15 T60,5 T80,18 T100,8 L100,20 L0,20 Z"
-                fill="currentColor"
-              />
-
-              <path
-                className="text-[#ffb4ab]"
-                d="M0,15 Q10,5 20,10 T40,15 T60,5 T80,18 T100,8"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
-
-            </svg>
 
           </div>
 
@@ -411,21 +405,23 @@ export const NetworkActivityView: React.FC = () => {
 
 
       {/* ======================================================
-          CONNECTION TABLE
+          LIVE NETWORK TABLE
           ====================================================== */}
 
       <div className="bg-[#1d2027] rounded border border-[#424754] flex flex-col flex-1 overflow-hidden">
 
+
         {/* HEADER */}
 
-        <div className="p-3 border-b border-[#424754] flex flex-wrap justify-between items-center bg-[#272a31]/50 gap-2">
+        <div className="p-3 border-b border-[#424754] flex flex-wrap justify-between items-center gap-2 bg-[#272a31]/50">
+
 
           <div className="flex items-center gap-2">
 
             <Network className="w-5 h-5 text-[#adc6ff]" />
 
             <span className="font-mono text-[11px] font-bold text-[#e1e2ec] tracking-wider uppercase">
-              LIVE NETWORK CONNECTIONS
+              Live Network Connections
             </span>
 
             <span className="font-mono text-[9px] text-[#4edea3]">
@@ -437,24 +433,28 @@ export const NetworkActivityView: React.FC = () => {
 
           <div className="flex items-center gap-2">
 
+
+            {/* SEARCH */}
+
             <div className="relative">
 
               <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8c909f]" />
 
               <input
-                type="text"
                 value={filterText}
-                onChange={(e) =>
+                onChange={(event) =>
                   setFilterText(
-                    e.target.value
+                    event.target.value
                   )
                 }
-                placeholder="Filter by IP, Port, Process..."
-                className="bg-[#10131a] border border-[#424754] rounded pl-8 pr-3 py-1 font-mono text-[11px] text-[#e1e2ec] focus:outline-none focus:border-[#adc6ff] w-64 placeholder-[#8c909f]"
+                placeholder="Filter IP / Process / PID..."
+                className="bg-[#10131a] border border-[#424754] rounded pl-8 pr-3 py-1.5 font-mono text-[10px] text-[#e1e2ec] focus:outline-none focus:border-[#adc6ff] w-56 placeholder-[#8c909f]"
               />
 
             </div>
 
+
+            {/* FILTERS */}
 
             <div className="flex gap-1">
 
@@ -463,25 +463,28 @@ export const NetworkActivityView: React.FC = () => {
                 'SUSPICIOUS',
                 'ANOMALY',
                 'NORMAL',
-              ].map((st) => (
+              ].map(
+                (filter) => (
 
-                <button
-                  key={st}
-                  onClick={() =>
-                    setSelectedStatusFilter(
-                      st
-                    )
-                  }
-                  className={`px-2 py-1 rounded font-mono text-[9px] font-bold border ${
-                    selectedStatusFilter === st
-                      ? 'bg-[#adc6ff] text-[#002e6a] border-[#adc6ff]'
-                      : 'bg-[#10131a] text-[#c2c6d6] border-[#424754] hover:bg-[#272a31]'
-                  }`}
-                >
-                  {st}
-                </button>
+                  <button
+                    key={filter}
+                    onClick={() =>
+                      setSelectedStatusFilter(
+                        filter
+                      )
+                    }
+                    className={`px-2 py-1.5 rounded font-mono text-[8px] font-bold border ${
+                      selectedStatusFilter ===
+                      filter
+                        ? 'bg-[#adc6ff] text-[#002e6a] border-[#adc6ff]'
+                        : 'bg-[#10131a] text-[#c2c6d6] border-[#424754] hover:bg-[#272a31]'
+                    }`}
+                  >
+                    {filter}
+                  </button>
 
-              ))}
+                )
+              )}
 
             </div>
 
@@ -492,39 +495,40 @@ export const NetworkActivityView: React.FC = () => {
 
         {/* TABLE */}
 
-        <div className="overflow-auto max-h-[540px]">
+        <div className="overflow-auto max-h-[560px]">
 
-          <table className="w-full text-left border-collapse font-mono text-[11px]">
+          <table className="w-full text-left border-collapse font-mono text-[10px]">
 
-            <thead className="sticky top-0 bg-[#32353c] border-b border-[#424754] z-10 text-[#c2c6d6] text-[10px] uppercase font-bold tracking-wider">
+
+            <thead className="sticky top-0 bg-[#32353c] border-b border-[#424754] z-10 text-[#c2c6d6] uppercase font-bold tracking-wider">
 
               <tr>
 
-                <th className="p-2.5 pl-4 whitespace-nowrap w-24">
+                <th className="p-2.5 pl-4">
                   TIME (UTC)
                 </th>
 
-                <th className="p-2.5 whitespace-nowrap">
+                <th className="p-2.5">
                   PROCESS
                 </th>
 
-                <th className="p-2.5 whitespace-nowrap w-20">
+                <th className="p-2.5">
                   PID
                 </th>
 
-                <th className="p-2.5 whitespace-nowrap">
+                <th className="p-2.5">
                   LOCAL ADDRESS
                 </th>
 
-                <th className="p-2.5 whitespace-nowrap">
+                <th className="p-2.5">
                   REMOTE ADDRESS
                 </th>
 
-                <th className="p-2.5 whitespace-nowrap w-24">
+                <th className="p-2.5">
                   STATUS
                 </th>
 
-                <th className="p-2.5 pr-4 whitespace-nowrap w-40 text-right">
+                <th className="p-2.5 pr-4 text-right">
                   INDICATOR
                 </th>
 
@@ -533,168 +537,182 @@ export const NetworkActivityView: React.FC = () => {
             </thead>
 
 
-            <tbody className="divide-y divide-[#424754]/30 text-[#e1e2ec]">
+            <tbody className="divide-y divide-[#424754]/30">
 
-              {filteredConnections.map(
-                (conn) => {
 
-                  const isRepeated =
-                    conn.indicator ===
-                      'repeated_connection_to_endpoint' ||
-                    conn.indicator ===
-                      'repeated_connection';
+              {filteredConnections.length === 0 ? (
 
-                  const isNewConnection =
-                    conn.indicator ===
-                    'new_established_connection';
+                <tr>
 
-                  return (
+                  <td
+                    colSpan={7}
+                    className="p-10 text-center text-[#8c909f]"
+                  >
+                    No network events match the current filter.
+                  </td>
 
-                    <tr
-                      key={conn.id}
-                      onClick={() => {
+                </tr>
 
-                        setSelectedConnection(
-                          conn
-                        );
+              ) : (
 
-                        const matchedProcess =
-                          processes.find(
-                            (process) =>
-                              process.pid ===
-                              conn.pid
-                          );
+                filteredConnections.map(
+                  (connection) => {
 
-                        if (
-                          matchedProcess
-                        ) {
-                          setSelectedProcess(
-                            matchedProcess
-                          );
+                    const indicator =
+                      (
+                        connection.indicator ||
+                        ''
+                      ).toLowerCase();
+
+
+                    const isRepeated =
+                      indicator ===
+                        'repeated_connection_to_endpoint' ||
+                      indicator ===
+                        'repeated_connection';
+
+
+                    const isEstablished =
+                      connection.status ===
+                        'ESTABLISHED' ||
+                      connection.status ===
+                        'ESTAB';
+
+
+                    return (
+
+                      <tr
+                        key={connection.id}
+                        onClick={() =>
+                          inspectConnection(
+                            connection
+                          )
                         }
-
-                      }}
-                      className={`hover:bg-[#272a31] transition-colors group cursor-pointer ${
-                        isRepeated
-                          ? 'bg-[#93000a]/15 border-l-2 border-l-[#ffb4ab]'
-                          : ''
-                      }`}
-                    >
-
-                      <td className="p-2.5 pl-4 text-[#c2c6d6]">
-                        {conn.time}
-                      </td>
+                        className={`cursor-pointer hover:bg-[#272a31] transition-colors ${
+                          isRepeated
+                            ? 'bg-[#93000a]/15 border-l-2 border-l-[#ffb4ab]'
+                            : ''
+                        }`}
+                      >
 
 
-                      <td className="p-2.5">
+                        {/* TIME */}
 
-                        <div className="flex items-center gap-2">
+                        <td className="p-2.5 pl-4 text-[#c2c6d6] whitespace-nowrap">
+                          {connection.time}
+                        </td>
 
-                          {isRepeated ? (
 
-                            <AlertTriangle className="w-3.5 h-3.5 text-[#ffb4ab]" />
+                        {/* PROCESS */}
+
+                        <td className="p-2.5">
+
+                          <div className="flex items-center gap-2">
+
+                            {isRepeated ? (
+
+                              <AlertTriangle className="w-3.5 h-3.5 text-[#ffb4ab]" />
+
+                            ) : (
+
+                              <Terminal className="w-3.5 h-3.5 text-[#8c909f]" />
+
+                            )}
+
+                            <span
+                              className={
+                                isRepeated
+                                  ? 'text-[#ffb4ab] font-bold'
+                                  : 'text-[#adc6ff]'
+                              }
+                            >
+                              {connection.process ||
+                                'Unknown'}
+                            </span>
+
+                          </div>
+
+                        </td>
+
+
+                        {/* PID */}
+
+                        <td className="p-2.5 text-[#c2c6d6]">
+                          {connection.pid ??
+                            '—'}
+                        </td>
+
+
+                        {/* LOCAL */}
+
+                        <td className="p-2.5 text-[#e1e2ec] whitespace-nowrap">
+                          {connection.localAddress ||
+                            'Unknown'}
+                        </td>
+
+
+                        {/* REMOTE */}
+
+                        <td className="p-2.5 text-[#e1e2ec] font-bold whitespace-nowrap">
+                          {connection.remoteAddress ||
+                            'Unknown'}
+                        </td>
+
+
+                        {/* STATUS */}
+
+                        <td className="p-2.5">
+
+                          {isEstablished ? (
+
+                            <span className="text-[#4edea3] flex items-center gap-1.5">
+
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3]" />
+
+                              ESTABLISHED
+
+                            </span>
 
                           ) : (
 
-                            <Terminal className="w-3.5 h-3.5 text-[#8c909f]" />
+                            <span className="text-[#c2c6d6]">
+                              {connection.status ||
+                                'UNKNOWN'}
+                            </span>
 
                           )}
 
-                          <span
-                            className={
-                              isRepeated
-                                ? 'text-[#ffb4ab] font-bold'
-                                : 'text-[#adc6ff]'
-                            }
-                          >
-                            {conn.process ||
-                              'Unknown'}
-                          </span>
-
-                        </div>
-
-                      </td>
+                        </td>
 
 
-                      <td className="p-2.5 text-[#c2c6d6]">
-                        {conn.pid ??
-                          '—'}
-                      </td>
+                        {/* INDICATOR */}
 
+                        <td className="p-2.5 pr-4 text-right">
 
-                      <td className="p-2.5 text-[#e1e2ec]">
-                        {conn.localAddress ||
-                          'Unknown'}
-                      </td>
+                          {isRepeated ? (
 
+                            <span className="inline-block px-2 py-0.5 border border-[#ffb4ab] bg-[#93000a]/40 rounded text-[#ffb4ab] font-bold text-[8px]">
+                              REPEATED ENDPOINT
+                            </span>
 
-                      <td className="p-2.5 font-bold text-[#e1e2ec]">
-                        {conn.remoteAddress ||
-                          'Unknown'}
-                      </td>
+                          ) : (
 
+                            <span className="inline-block px-2 py-0.5 border border-[#424754] bg-[#10131a] rounded text-[#c2c6d6] text-[8px]">
+                              {connection.indicator ||
+                                'OBSERVED'}
+                            </span>
 
-                      <td className="p-2.5">
+                          )}
 
-                        {conn.status ===
-                          'ESTABLISHED' ||
-                        conn.status ===
-                          'ESTAB' ? (
+                        </td>
 
-                          <span className="text-[#4edea3] flex items-center gap-1.5">
+                      </tr>
 
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3]" />
+                    );
 
-                            ESTABLISHED
+                  }
+                )
 
-                          </span>
-
-                        ) : (
-
-                          <span className="text-[#c2c6d6] flex items-center gap-1.5">
-
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#8c909f]" />
-
-                            {conn.status ||
-                              'UNKNOWN'}
-
-                          </span>
-
-                        )}
-
-                      </td>
-
-
-                      <td className="p-2.5 pr-4 text-right">
-
-                        {isRepeated ? (
-
-                          <span className="inline-block px-2 py-0.5 border border-[#ffb4ab] bg-[#93000a]/40 rounded text-[#ffb4ab] font-bold text-[9px]">
-                            REPEATED ENDPOINT
-                          </span>
-
-                        ) : isNewConnection ? (
-
-                          <span className="inline-block px-2 py-0.5 border border-[#424754] rounded text-[#c2c6d6] bg-[#10131a] text-[9px]">
-                            NEW CONNECTION
-                          </span>
-
-                        ) : (
-
-                          <span className="inline-block px-2 py-0.5 border border-[#424754] rounded text-[#c2c6d6] bg-[#10131a] text-[9px]">
-                            {conn.indicator ||
-                              'OBSERVED'}
-                          </span>
-
-                        )}
-
-                      </td>
-
-                    </tr>
-
-                  );
-
-                }
               )}
 
             </tbody>
@@ -712,11 +730,13 @@ export const NetworkActivityView: React.FC = () => {
 
       {selectedConnection && (
 
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
 
-          <div className="bg-[#191b23] border border-[#424754] rounded-lg max-w-md w-full p-5 shadow-2xl space-y-4 font-mono text-[11px]">
 
-            <div className="flex items-center justify-between border-b border-[#424754] pb-3">
+          <div className="bg-[#191b23] border border-[#424754] rounded-lg max-w-md w-full p-5 shadow-2xl font-mono text-[11px]">
+
+
+            <div className="flex items-center justify-between border-b border-[#424754] pb-3 mb-4">
 
               <div className="flex items-center gap-2">
 
@@ -727,6 +747,7 @@ export const NetworkActivityView: React.FC = () => {
                 </h3>
 
               </div>
+
 
               <button
                 onClick={() =>
@@ -744,13 +765,14 @@ export const NetworkActivityView: React.FC = () => {
 
             <div className="space-y-3">
 
+
               <div className="flex justify-between gap-4">
 
                 <span className="text-[#8c909f]">
                   PROCESS
                 </span>
 
-                <span className="text-[#e1e2ec] text-right">
+                <span className="text-[#e1e2ec]">
                   {selectedConnection.process ||
                     'Unknown'}
                 </span>
@@ -778,7 +800,7 @@ export const NetworkActivityView: React.FC = () => {
                   LOCAL
                 </span>
 
-                <span className="text-[#adc6ff] text-right">
+                <span className="text-[#adc6ff]">
                   {selectedConnection.localAddress ||
                     'Unknown'}
                 </span>
@@ -792,7 +814,7 @@ export const NetworkActivityView: React.FC = () => {
                   REMOTE
                 </span>
 
-                <span className="text-[#adc6ff] text-right">
+                <span className="text-[#adc6ff]">
                   {selectedConnection.remoteAddress ||
                     'Unknown'}
                 </span>
@@ -843,37 +865,39 @@ export const NetworkActivityView: React.FC = () => {
             </div>
 
 
-            <div className="border-t border-[#424754] pt-3 text-[#8c909f] text-[10px] leading-relaxed">
+            <div className="border-t border-[#424754] mt-4 pt-3 text-[#8c909f] text-[9px] leading-relaxed">
 
-              Network indicators are behavioral evidence only.
-              A repeated connection does not by itself prove
-              command-and-control or ransomware activity.
+              Network indicators are behavioral evidence.
+              A repeated endpoint does not independently
+              prove command-and-control or ransomware activity.
 
             </div>
 
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 mt-4">
+
 
               <button
                 onClick={() => {
 
-                  const matchedProcess =
+                  const process =
                     processes.find(
-                      (process) =>
-                        process.pid ===
+                      (item) =>
+                        item.pid ===
                         selectedConnection.pid
                     );
 
-                  if (
-                    matchedProcess
-                  ) {
+
+                  if (process) {
+
                     setSelectedProcess(
-                      matchedProcess
+                      process
                     );
 
                     setActiveTab(
                       'process-activity'
                     );
+
                   }
 
                   setSelectedConnection(
@@ -907,5 +931,7 @@ export const NetworkActivityView: React.FC = () => {
       )}
 
     </div>
+
   );
+
 };
