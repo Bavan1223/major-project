@@ -114,99 +114,45 @@ def calculate_risk(events):
     """
     Dashboard-level risk summary.
 
-    Finds the LATEST risk_assessment event from the
-    detection engine, which is the authoritative source
-    of truth for the current behavioral risk state.
+    AUTHORITATIVE SOURCE OF TRUTH:
+        The IncidentManager determines current risk.
+        - Active incident exists → use its risk level
+        - No active incident → NORMAL
 
-    Falls back to other detection_engine events if no
-    risk_assessment exists.
-
-    This endpoint does NOT replace core/risk_engine.py.
-    The core risk engine remains authoritative for actual
-    project risk decisions.
+    Historical risk_assessment events in events.jsonl are
+    EVIDENCE/HISTORY, not current state. A closed incident
+    does not mean the system is currently under attack.
     """
+    from core.incident_manager import incident_manager
 
-    detection_events = events_by_source(
-        events,
-        "detection_engine"
-    )
+    # The incident manager is the single source of truth
+    active = incident_manager.get_active_incident()
 
-    if not detection_events:
+    if active:
         return {
-            "risk_level": "NORMAL",
-            "reason": (
-                "No currently implemented "
-                "high-risk behavioral activity detected."
-            ),
-            "signals": [],
-            "detected": False,
-            "timestamp": None
+            "risk_level": active["risk_level"],
+            "reason": active["reason"],
+            "signals": active["signals"],
+            "detected": True,
+            "timestamp": active["updated_at"],
+            "ml_contributed": active.get("ml_contributed", False),
+            "incident_id": active["incident_id"],
+            "incident_status": active["status"],
         }
 
-    # Prefer the latest risk_assessment event (authoritative)
-    risk_assessments = [
-        event for event in detection_events
-        if event.get("event_type") == "risk_assessment"
-    ]
-
-    if risk_assessments:
-        latest = risk_assessments[-1]
-        data = latest.get("data", {})
-
-        risk_level = data.get(
-            "risk_level", "NORMAL"
-        )
-
-        reason = data.get(
-            "reason",
-            "No reason provided."
-        )
-
-        signals = data.get(
-            "signals",
-            []
-        )
-
-        return {
-            "risk_level": risk_level,
-            "reason": reason,
-            "signals": signals,
-            "detected": risk_level not in (
-                "NORMAL", "LOW"
-            ),
-            "timestamp": latest.get(
-                "timestamp"
-            ),
-            "ml_contributed": data.get(
-                "ml_contributed", False
-            )
-        }
-
-    # Fallback: use the latest detection event
-    latest_detection = detection_events[-1]
-    data = latest_detection.get("data", {})
-
-    risk_level = data.get(
-        "risk_level", "HIGH"
-    )
-
+    # No active incident = system is NORMAL
     return {
-        "risk_level": risk_level,
+        "risk_level": "NORMAL",
         "reason": (
-            data.get("reason")
-            or latest_detection.get("indicator")
-            or "Suspicious behavior detected."
+            "No active ransomware-like behavioral "
+            "activity detected."
         ),
-        "signals": data.get(
-            "signals",
-            [latest_detection.get("indicator")]
-            if latest_detection.get("indicator")
-            else []
-        ),
-        "detected": True,
-        "timestamp": latest_detection.get(
-            "timestamp"
-        )
+        "signals": [],
+        "detected": False,
+        "timestamp": None,
+        "ml_contributed": False,
+        "incident_id": None,
+        "incident_status": None,
     }
 
 
@@ -469,6 +415,8 @@ def api_status():
     # Get active incident info
     from core.incident_manager import incident_manager
     active = incident_manager.get_active_incident()
+    ml_prob = active.get("ml_probability", 0.0) if active else 0.0
+    ml_contributed = active.get("ml_contributed", False) if active else False
 
     return jsonify({
 
@@ -510,12 +458,13 @@ def api_status():
             active["status"] if active else None,
 
         "ml_probability":
-            active.get("ml_probability", 0.0) if active else 0.0,
+            ml_prob,
 
         "ml_classification":
-            "RANSOMWARE_LIKE"
-            if active and active.get("ml_probability", 0) > 0.7
-            else "NORMAL",
+            "RANSOMWARE_LIKE" if ml_prob > 0.7 else "NORMAL",
+
+        "ml_contributed":
+            ml_contributed,
 
         "timestamp":
             datetime.now().isoformat(
@@ -707,34 +656,25 @@ def api_files():
 def api_risk():
 
     events = read_events()
+    risk = calculate_risk(events)
 
-    risk = calculate_risk(
-        events
-    )
-
-    # Enrich with incident and ML data
+    # Build consistent ML sub-object from incident manager
     from core.incident_manager import incident_manager
     active = incident_manager.get_active_incident()
 
+    ml_prob = active.get("ml_probability", 0.0) if active else 0.0
+    ml_contributed = active.get("ml_contributed", False) if active else False
+
     result = dict(risk)
-    if active:
-        result["incident_id"] = active["incident_id"]
-        result["ml"] = {
-            "classification": "RANSOMWARE_LIKE"
-            if active.get("ml_probability", 0) > 0.7
-            else "NORMAL",
-            "probability": active.get("ml_probability", 0),
-            "threshold": 0.7,
-            "contributed": active.get("ml_contributed", False),
-        }
-    else:
-        result["incident_id"] = None
-        result["ml"] = {
-            "classification": "NORMAL",
-            "probability": 0.0,
-            "threshold": 0.7,
-            "contributed": False,
-        }
+    result["incident_id"] = active["incident_id"] if active else None
+    result["ml"] = {
+        "classification": "RANSOMWARE_LIKE" if ml_prob > 0.7 else "NORMAL",
+        "probability": ml_prob,
+        "threshold": 0.7,
+        "contributed": ml_contributed,
+    }
+    # Ensure top-level ml_contributed matches the ml sub-object
+    result["ml_contributed"] = ml_contributed
 
     return jsonify(result)
 

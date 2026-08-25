@@ -15,6 +15,7 @@ env/
 # Generated logs
 logs/*.jsonl
 logs/incidents.json
+logs/audit.json
 
 # Generated test files
 test-files/*

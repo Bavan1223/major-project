@@ -21,6 +21,7 @@ Actions:
 """
 
 import os
+import json
 import shutil
 from datetime import datetime
 from typing import Optional
@@ -45,7 +46,34 @@ SNAPSHOTS_DIR = os.path.join(RECOVERY_DIR, "snapshots")
 # AUDIT LOG
 # ==============================================================
 
+AUDIT_FILE = os.path.join(PROJECT_ROOT, "logs", "audit.json")
+
 _audit_log: list = []
+
+
+def _load_audit():
+    """Load audit log from disk."""
+    global _audit_log
+    if os.path.exists(AUDIT_FILE):
+        try:
+            with open(AUDIT_FILE, "r") as f:
+                _audit_log = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            _audit_log = []
+
+
+def _save_audit():
+    """Persist audit log to disk."""
+    os.makedirs(os.path.dirname(AUDIT_FILE), exist_ok=True)
+    try:
+        with open(AUDIT_FILE, "w") as f:
+            json.dump(_audit_log, f, indent=2, default=str)
+    except OSError:
+        pass
+
+
+# Load on module import
+_load_audit()
 
 
 def get_audit_log() -> list:
@@ -59,7 +87,7 @@ def _log_audit(
     incident_id: Optional[str] = None,
     success: bool = True,
 ) -> dict:
-    """Record an audit entry."""
+    """Record an audit entry and persist to disk."""
     entry = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "actor": "system",
@@ -70,6 +98,7 @@ def _log_audit(
         "detail": detail,
     }
     _audit_log.append(entry)
+    _save_audit()
 
     # Also add to incident timeline if applicable
     if incident_id:
