@@ -58,12 +58,16 @@ FILE MONITOR → PROCESS MONITOR → NETWORK MONITOR
             REACT SOC DASHBOARD (3000)
 ```
 ## for bavans dev the startup command 
+```bash
+
 cd ~/ransomware-lab && source .venv/bin/activate
 python3 start.py              # Starts everything
-
+```
 # separate terminal for attack:
-python3 simulator/safe_simulator.py   # Triggers CRITICAL
+```bash
 
+python3 simulator/safe_simulator.py   # Triggers CRITICAL
+```
 ## Requirements
 
 - Ubuntu Linux (VMware recommended)
