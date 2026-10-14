@@ -484,12 +484,27 @@ def evaluate_current_window():
             # Risk returned to NORMAL/LOW — clear active
             active = incident_manager.get_active_incident()
             if active:
-                incident_manager.add_timeline_event(
-                    active["incident_id"],
-                    "risk_cleared",
-                    "Behavioral risk returned to NORMAL.",
-                )
-                incident_manager.clear_active()
+                status = active.get("status")
+                created_str = active.get("created_at", "")
+                age = 0
+                if created_str:
+                    try:
+                        created_dt = datetime.fromisoformat(created_str)
+                        if created_dt.tzinfo is not None:
+                            created_dt = created_dt.replace(tzinfo=None)
+                        age = (datetime.now() - created_dt).total_seconds()
+                    except (ValueError, TypeError):
+                        age = 0
+
+                # Only auto-clear if still OPEN and created more than 30 seconds ago
+                # If INVESTIGATING, CONTAINED, or RESOLVED, never auto-clear
+                if status == "OPEN" and age > 30:
+                    incident_manager.add_timeline_event(
+                        active["incident_id"],
+                        "risk_cleared",
+                        "Behavioral risk returned to NORMAL.",
+                    )
+                    incident_manager.clear_active()
 
         # Update current incident state
         _current_incident_signature = new_signature

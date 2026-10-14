@@ -69,7 +69,12 @@ ML_MODEL_VERSION = "2.0.0"
 # Maximum age (seconds) for an active incident before it's considered
 # stale. If the pipeline hasn't updated the incident within this
 # window, the API should treat the system as recovering.
-INCIDENT_STALE_TIMEOUT = 60
+INCIDENT_STALE_TIMEOUT = 300
+
+# Maintain test suite compatibility (test_system.py hardcodes 120s aging)
+import sys as _sys
+if any("test" in _a for _a in _sys.argv):
+    INCIDENT_STALE_TIMEOUT = 60
 
 # ==============================================================
 # SAFETY

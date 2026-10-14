@@ -15,6 +15,47 @@ This is a **controlled academic lab** running on an isolated Ubuntu VM. The syst
 - No real network isolation occurs
 - All containment/prevention is simulated within the controlled test environment
 
+## Quick Start
+
+### Option 1: Run everything with one command
+```bash
+cd ~/ransomware-lab
+source .venv/bin/activate
+python3 start.py
+```
+
+### Option 2: Run components separately
+
+Terminal 1 — Backend + Detection:
+```bash
+cd ~/ransomware-lab
+source .venv/bin/activate
+python3 dashboard.py
+```
+
+Terminal 2 — File Monitor:
+```bash
+cd ~/ransomware-lab
+source .venv/bin/activate
+python3 monitor/file_monitor.py
+```
+
+Terminal 3 — Frontend:
+```bash
+cd ~/ransomware-lab/frontend
+npm run dev
+```
+
+### Trigger Detection (separate terminal):
+```bash
+cd ~/ransomware-lab
+source .venv/bin/activate
+python3 simulator/safe_simulator.py
+```
+
+Dashboard: http://192.168.74.131:3000  
+API: http://192.168.74.131:5000
+
 ## Architecture
 
 ```
